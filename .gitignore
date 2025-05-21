@@ -1,0 +1,13 @@
+__pycache__/
+.vscode/
+app/data/
+input_data/
+data_processing/__pycache__/
+sqlitedb/dashboard.db
+sqlitedb/dashboard_mock.db
+sqlitedb/polygenie.db
+sqlitedb/polygenie.db_backup
+production/
+pipeline/logs/header_check.log
+profiles_data/
+script.sh

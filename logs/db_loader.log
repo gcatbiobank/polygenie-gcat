@@ -1,0 +1,870 @@
+2025-04-09 09:51:25,761 - INFO - Loading pipeline data...
+2025-04-09 09:51:25,956 - INFO - Stored new metadata.
+2025-04-09 09:51:26,731 - INFO - Stored new prs: loss_x_binary
+2025-04-09 11:10:54,991 - INFO - Stored Metabolite correlations for loss_x_binary
+2025-04-09 16:20:00,734 - INFO - Loading pipeline data...
+2025-04-09 16:20:01,299 - INFO - Stored new metadata.
+2025-04-09 16:20:01,751 - INFO - Stored new prs: loss_x_binary
+2025-04-09 17:38:49,051 - INFO - Stored Metabolite correlations for loss_x_binary
+2025-04-09 17:41:27,978 - INFO - Stored Phecode correlations for loss_x_binary
+2025-04-09 17:44:06,937 - INFO - Stored ICD code correlations for loss_x_binary
+2025-04-09 17:44:11,455 - INFO - Stored Questionaire_log correlations for loss_x_binary
+2025-04-09 18:04:09,528 - INFO - Stored Questionaire_lin correlations for loss_x_binary
+2025-04-09 18:06:38,575 - INFO - Calculated new prevalences
+2025-04-09 18:06:42,671 - INFO - Stored new prevalences.
+2025-04-09 18:06:44,816 - INFO - Stored new prs: atrialfib
+2025-04-09 19:22:28,613 - INFO - Stored Metabolite correlations for atrialfib
+2025-04-09 19:23:36,145 - INFO - Stored Phecode correlations for atrialfib
+2025-04-09 19:25:13,234 - INFO - Stored ICD code correlations for atrialfib
+2025-04-09 19:25:15,731 - INFO - Stored Questionaire_log correlations for atrialfib
+2025-04-09 19:45:41,904 - INFO - Stored Questionaire_lin correlations for atrialfib
+2025-04-09 19:48:40,086 - INFO - Calculated new prevalences
+2025-04-09 19:49:00,655 - INFO - Stored new prevalences.
+2025-04-09 19:49:48,401 - INFO - Stored new prs: lc_n2
+2025-04-09 21:06:22,982 - INFO - Stored Metabolite correlations for lc_n2
+2025-04-09 21:07:33,784 - INFO - Stored Phecode correlations for lc_n2
+2025-04-09 21:09:07,677 - INFO - Stored ICD code correlations for lc_n2
+2025-04-09 21:09:10,124 - INFO - Stored Questionaire_log correlations for lc_n2
+2025-04-09 21:28:56,185 - INFO - Stored Questionaire_lin correlations for lc_n2
+2025-04-09 21:31:17,510 - INFO - Calculated new prevalences
+2025-04-09 21:31:28,556 - INFO - Stored new prevalences.
+2025-04-09 21:31:29,527 - INFO - Stored new prs: anterior_uveitis
+2025-04-09 22:47:45,198 - INFO - Stored Metabolite correlations for anterior_uveitis
+2025-04-09 22:48:52,294 - INFO - Stored Phecode correlations for anterior_uveitis
+2025-04-09 22:50:26,586 - INFO - Stored ICD code correlations for anterior_uveitis
+2025-04-09 22:50:29,160 - INFO - Stored Questionaire_log correlations for anterior_uveitis
+2025-04-09 23:10:15,644 - INFO - Stored Questionaire_lin correlations for anterior_uveitis
+2025-04-09 23:12:36,226 - INFO - Calculated new prevalences
+2025-04-09 23:12:44,432 - INFO - Stored new prevalences.
+2025-04-09 23:12:45,396 - INFO - Stored new prs: height
+2025-04-10 00:29:26,321 - INFO - Stored Metabolite correlations for height
+2025-04-10 00:30:34,190 - INFO - Stored Phecode correlations for height
+2025-04-10 00:32:09,008 - INFO - Stored ICD code correlations for height
+2025-04-10 00:32:11,442 - INFO - Stored Questionaire_log correlations for height
+2025-04-10 00:52:20,646 - INFO - Stored Questionaire_lin correlations for height
+2025-04-10 00:54:40,381 - INFO - Calculated new prevalences
+2025-04-10 00:54:45,945 - INFO - Stored new prevalences.
+2025-04-10 00:54:46,610 - INFO - Stored new prs: psoriasis
+2025-04-10 02:10:39,961 - INFO - Stored Metabolite correlations for psoriasis
+2025-04-10 02:11:49,400 - INFO - Stored Phecode correlations for psoriasis
+2025-04-10 02:13:23,454 - INFO - Stored ICD code correlations for psoriasis
+2025-04-10 02:13:26,316 - INFO - Stored Questionaire_log correlations for psoriasis
+2025-04-10 02:33:57,938 - INFO - Stored Questionaire_lin correlations for psoriasis
+2025-04-10 02:36:15,433 - INFO - Calculated new prevalences
+2025-04-10 02:36:20,214 - INFO - Stored new prevalences.
+2025-04-10 02:36:20,981 - INFO - Stored new prs: restless_leg
+2025-04-10 03:52:53,409 - INFO - Stored Metabolite correlations for restless_leg
+2025-04-10 03:53:59,495 - INFO - Stored Phecode correlations for restless_leg
+2025-04-10 03:55:33,668 - INFO - Stored ICD code correlations for restless_leg
+2025-04-10 03:55:36,091 - INFO - Stored Questionaire_log correlations for restless_leg
+2025-04-10 04:15:44,825 - INFO - Stored Questionaire_lin correlations for restless_leg
+2025-04-10 04:18:03,687 - INFO - Calculated new prevalences
+2025-04-10 04:18:09,004 - INFO - Stored new prevalences.
+2025-04-10 04:18:09,687 - INFO - Stored new prs: diet_carb
+2025-04-10 05:36:27,923 - INFO - Stored Metabolite correlations for diet_carb
+2025-04-10 05:37:32,457 - INFO - Stored Phecode correlations for diet_carb
+2025-04-10 05:39:08,363 - INFO - Stored ICD code correlations for diet_carb
+2025-04-10 05:39:10,786 - INFO - Stored Questionaire_log correlations for diet_carb
+2025-04-10 05:59:14,295 - INFO - Stored Questionaire_lin correlations for diet_carb
+2025-04-10 06:01:34,365 - INFO - Calculated new prevalences
+2025-04-10 06:01:43,586 - INFO - Stored new prevalences.
+2025-04-10 06:01:44,921 - INFO - Stored new prs: subcortical
+2025-04-10 07:18:50,424 - INFO - Stored Metabolite correlations for subcortical
+2025-04-10 07:19:55,776 - INFO - Stored Phecode correlations for subcortical
+2025-04-10 07:21:32,426 - INFO - Stored ICD code correlations for subcortical
+2025-04-10 07:21:35,111 - INFO - Stored Questionaire_log correlations for subcortical
+2025-04-10 07:41:36,050 - INFO - Stored Questionaire_lin correlations for subcortical
+2025-04-10 07:43:56,607 - INFO - Calculated new prevalences
+2025-04-10 07:44:04,180 - INFO - Stored new prevalences.
+2025-04-10 07:44:05,560 - INFO - Stored new prs: ltl
+2025-04-10 08:59:45,215 - INFO - Stored Metabolite correlations for ltl
+2025-04-10 09:00:50,638 - INFO - Stored Phecode correlations for ltl
+2025-04-10 09:02:25,766 - INFO - Stored ICD code correlations for ltl
+2025-04-10 09:02:28,262 - INFO - Stored Questionaire_log correlations for ltl
+2025-04-10 09:22:40,638 - INFO - Stored Questionaire_lin correlations for ltl
+2025-04-10 09:25:00,395 - INFO - Calculated new prevalences
+2025-04-10 09:25:07,707 - INFO - Stored new prevalences.
+2025-04-10 09:25:09,189 - INFO - Stored new prs: hypothyroidism
+2025-04-10 10:42:00,410 - INFO - Stored Metabolite correlations for hypothyroidism
+2025-04-10 10:43:17,606 - INFO - Stored Phecode correlations for hypothyroidism
+2025-04-10 10:44:59,760 - INFO - Stored ICD code correlations for hypothyroidism
+2025-04-10 10:45:02,063 - INFO - Stored Questionaire_log correlations for hypothyroidism
+2025-04-10 11:04:59,571 - INFO - Stored Questionaire_lin correlations for hypothyroidism
+2025-04-10 11:08:42,638 - INFO - Calculated new prevalences
+2025-04-10 11:08:49,507 - INFO - Stored new prevalences.
+2025-04-10 11:08:53,937 - INFO - Stored new prs: caudalmiddlefrontal_cortical
+2025-04-10 12:24:41,571 - INFO - Stored Metabolite correlations for caudalmiddlefrontal_cortical
+2025-04-10 12:25:52,739 - INFO - Stored Phecode correlations for caudalmiddlefrontal_cortical
+2025-04-10 12:27:27,844 - INFO - Stored ICD code correlations for caudalmiddlefrontal_cortical
+2025-04-10 12:27:30,449 - INFO - Stored Questionaire_log correlations for caudalmiddlefrontal_cortical
+2025-04-10 12:47:17,196 - INFO - Stored Questionaire_lin correlations for caudalmiddlefrontal_cortical
+2025-04-10 12:49:36,643 - INFO - Calculated new prevalences
+2025-04-10 12:49:42,966 - INFO - Stored new prevalences.
+2025-04-10 12:49:45,869 - INFO - Stored new prs: amyloid_p
+2025-04-10 14:07:44,398 - INFO - Stored Metabolite correlations for amyloid_p
+2025-04-10 14:15:27,278 - INFO - Stored Phecode correlations for amyloid_p
+2025-04-10 14:26:50,386 - INFO - Stored ICD code correlations for amyloid_p
+2025-04-10 14:26:53,314 - INFO - Stored Questionaire_log correlations for amyloid_p
+2025-04-10 14:50:08,373 - INFO - Stored Questionaire_lin correlations for amyloid_p
+2025-04-10 14:52:58,649 - INFO - Calculated new prevalences
+2025-04-10 14:53:01,597 - INFO - Stored new prevalences.
+2025-04-10 14:53:02,531 - INFO - Stored new prs: diet_fat
+2025-04-10 16:12:12,618 - INFO - Stored Metabolite correlations for diet_fat
+2025-04-10 16:13:32,100 - INFO - Stored Phecode correlations for diet_fat
+2025-04-10 16:15:07,049 - INFO - Stored ICD code correlations for diet_fat
+2025-04-10 16:15:09,541 - INFO - Stored Questionaire_log correlations for diet_fat
+2025-04-10 16:35:36,815 - INFO - Stored Questionaire_lin correlations for diet_fat
+2025-04-10 16:38:22,749 - INFO - Calculated new prevalences
+2025-04-10 16:38:27,487 - INFO - Stored new prevalences.
+2025-04-10 16:38:29,720 - INFO - Stored new prs: vegetarianism
+2025-04-10 17:57:36,162 - INFO - Stored Metabolite correlations for vegetarianism
+2025-04-10 17:58:58,562 - INFO - Stored Phecode correlations for vegetarianism
+2025-04-10 18:00:58,420 - INFO - Stored ICD code correlations for vegetarianism
+2025-04-10 18:01:01,558 - INFO - Stored Questionaire_log correlations for vegetarianism
+2025-04-10 18:21:35,942 - INFO - Stored Questionaire_lin correlations for vegetarianism
+2025-04-10 18:24:03,171 - INFO - Calculated new prevalences
+2025-04-10 18:24:08,099 - INFO - Stored new prevalences.
+2025-04-10 18:24:10,003 - INFO - Stored new prs: gestational_diabetes
+2025-04-10 19:40:03,496 - INFO - Stored Metabolite correlations for gestational_diabetes
+2025-04-10 19:41:43,718 - INFO - Stored Phecode correlations for gestational_diabetes
+2025-04-10 19:43:58,605 - INFO - Stored ICD code correlations for gestational_diabetes
+2025-04-10 19:44:01,838 - INFO - Stored Questionaire_log correlations for gestational_diabetes
+2025-04-10 20:03:53,505 - INFO - Stored Questionaire_lin correlations for gestational_diabetes
+2025-04-10 20:06:30,740 - INFO - Calculated new prevalences
+2025-04-10 20:06:37,835 - INFO - Stored new prevalences.
+2025-04-10 20:06:39,464 - INFO - Stored new prs: fvc
+2025-04-10 21:21:44,308 - INFO - Stored Metabolite correlations for fvc
+2025-04-10 21:22:55,400 - INFO - Stored Phecode correlations for fvc
+2025-04-10 21:24:30,840 - INFO - Stored ICD code correlations for fvc
+2025-04-10 21:24:33,580 - INFO - Stored Questionaire_log correlations for fvc
+2025-04-10 21:44:21,206 - INFO - Stored Questionaire_lin correlations for fvc
+2025-04-10 21:46:43,213 - INFO - Calculated new prevalences
+2025-04-10 21:46:47,857 - INFO - Stored new prevalences.
+2025-04-10 21:46:49,227 - INFO - Stored new prs: whr
+2025-04-10 23:02:52,101 - INFO - Stored Metabolite correlations for whr
+2025-04-10 23:04:10,867 - INFO - Stored Phecode correlations for whr
+2025-04-10 23:06:10,601 - INFO - Stored ICD code correlations for whr
+2025-04-10 23:06:13,531 - INFO - Stored Questionaire_log correlations for whr
+2025-04-10 23:26:03,920 - INFO - Stored Questionaire_lin correlations for whr
+2025-04-10 23:28:31,731 - INFO - Calculated new prevalences
+2025-04-10 23:28:35,393 - INFO - Stored new prevalences.
+2025-04-10 23:28:37,786 - INFO - Stored new prs: global_cortical
+2025-04-11 00:44:33,939 - INFO - Stored Metabolite correlations for global_cortical
+2025-04-11 00:45:39,731 - INFO - Stored Phecode correlations for global_cortical
+2025-04-11 00:47:12,013 - INFO - Stored ICD code correlations for global_cortical
+2025-04-11 00:47:14,540 - INFO - Stored Questionaire_log correlations for global_cortical
+2025-04-11 01:07:07,565 - INFO - Stored Questionaire_lin correlations for global_cortical
+2025-04-11 01:09:29,005 - INFO - Calculated new prevalences
+2025-04-11 01:09:33,516 - INFO - Stored new prevalences.
+2025-04-11 01:09:34,961 - INFO - Stored new prs: pef
+2025-04-11 02:26:17,333 - INFO - Stored Metabolite correlations for pef
+2025-04-11 02:27:24,073 - INFO - Stored Phecode correlations for pef
+2025-04-11 02:28:56,302 - INFO - Stored ICD code correlations for pef
+2025-04-11 02:28:58,627 - INFO - Stored Questionaire_log correlations for pef
+2025-04-11 02:48:53,478 - INFO - Stored Questionaire_lin correlations for pef
+2025-04-11 02:51:16,121 - INFO - Calculated new prevalences
+2025-04-11 02:51:21,460 - INFO - Stored new prevalences.
+2025-04-11 02:51:22,727 - INFO - Stored new prs: diver
+2025-04-11 04:07:04,018 - INFO - Stored Metabolite correlations for diver
+2025-04-11 04:08:11,989 - INFO - Stored Phecode correlations for diver
+2025-04-11 04:09:45,195 - INFO - Stored ICD code correlations for diver
+2025-04-11 04:09:47,609 - INFO - Stored Questionaire_log correlations for diver
+2025-04-11 04:29:22,533 - INFO - Stored Questionaire_lin correlations for diver
+2025-04-11 04:31:48,734 - INFO - Calculated new prevalences
+2025-04-11 04:31:52,742 - INFO - Stored new prevalences.
+2025-04-11 04:31:53,952 - INFO - Stored new prs: broad_depression
+2025-04-11 05:48:09,460 - INFO - Stored Metabolite correlations for broad_depression
+2025-04-11 05:49:44,245 - INFO - Stored Phecode correlations for broad_depression
+2025-04-11 05:51:16,300 - INFO - Stored ICD code correlations for broad_depression
+2025-04-11 05:51:18,578 - INFO - Stored Questionaire_log correlations for broad_depression
+2025-04-11 06:11:24,962 - INFO - Stored Questionaire_lin correlations for broad_depression
+2025-04-11 06:13:46,076 - INFO - Calculated new prevalences
+2025-04-11 06:13:50,313 - INFO - Stored new prevalences.
+2025-04-11 06:13:51,715 - INFO - Stored new prs: raynaud
+2025-04-11 07:30:52,664 - INFO - Stored Metabolite correlations for raynaud
+2025-04-11 07:32:12,435 - INFO - Stored Phecode correlations for raynaud
+2025-04-11 07:33:44,752 - INFO - Stored ICD code correlations for raynaud
+2025-04-11 07:33:47,086 - INFO - Stored Questionaire_log correlations for raynaud
+2025-04-11 07:53:28,266 - INFO - Stored Questionaire_lin correlations for raynaud
+2025-04-11 07:55:56,947 - INFO - Calculated new prevalences
+2025-04-11 07:56:02,305 - INFO - Stored new prevalences.
+2025-04-11 07:56:04,583 - INFO - Stored new prs: hand_eczema
+2025-04-11 09:11:10,619 - INFO - Stored Metabolite correlations for hand_eczema
+2025-04-11 09:12:46,626 - INFO - Stored Phecode correlations for hand_eczema
+2025-04-11 09:14:19,217 - INFO - Stored ICD code correlations for hand_eczema
+2025-04-11 09:14:21,453 - INFO - Stored Questionaire_log correlations for hand_eczema
+2025-04-11 09:34:09,596 - INFO - Stored Questionaire_lin correlations for hand_eczema
+2025-04-11 09:36:34,074 - INFO - Calculated new prevalences
+2025-04-11 09:36:38,748 - INFO - Stored new prevalences.
+2025-04-11 09:36:40,487 - INFO - Stored new prs: lc_w2
+2025-04-11 10:51:58,943 - INFO - Stored Metabolite correlations for lc_w2
+2025-04-11 10:53:05,156 - INFO - Stored Phecode correlations for lc_w2
+2025-04-11 10:54:37,692 - INFO - Stored ICD code correlations for lc_w2
+2025-04-11 10:54:40,097 - INFO - Stored Questionaire_log correlations for lc_w2
+2025-04-11 11:14:21,811 - INFO - Stored Questionaire_lin correlations for lc_w2
+2025-04-11 11:16:45,467 - INFO - Calculated new prevalences
+2025-04-11 11:16:50,625 - INFO - Stored new prevalences.
+2025-04-11 11:16:54,088 - INFO - Stored new prs: fev1
+2025-04-11 12:34:04,918 - INFO - Stored Metabolite correlations for fev1
+2025-04-11 12:35:13,640 - INFO - Stored Phecode correlations for fev1
+2025-04-11 12:36:48,398 - INFO - Stored ICD code correlations for fev1
+2025-04-11 12:36:50,646 - INFO - Stored Questionaire_log correlations for fev1
+2025-04-11 12:56:39,412 - INFO - Stored Questionaire_lin correlations for fev1
+2025-04-11 12:59:01,841 - INFO - Calculated new prevalences
+2025-04-11 12:59:05,888 - INFO - Stored new prevalences.
+2025-04-11 12:59:07,892 - INFO - Stored new prs: anxiety
+2025-04-11 14:14:20,441 - INFO - Stored Metabolite correlations for anxiety
+2025-04-11 14:15:26,882 - INFO - Stored Phecode correlations for anxiety
+2025-04-11 14:16:58,523 - INFO - Stored ICD code correlations for anxiety
+2025-04-11 14:17:00,772 - INFO - Stored Questionaire_log correlations for anxiety
+2025-04-11 14:36:47,250 - INFO - Stored Questionaire_lin correlations for anxiety
+2025-04-11 14:39:11,258 - INFO - Calculated new prevalences
+2025-04-11 14:39:15,519 - INFO - Stored new prevalences.
+2025-04-11 14:39:18,214 - INFO - Stored new prs: social_deprivation
+2025-04-11 15:53:35,633 - INFO - Stored Metabolite correlations for social_deprivation
+2025-04-11 15:59:12,034 - INFO - Stored Phecode correlations for social_deprivation
+2025-04-11 16:08:23,350 - INFO - Stored ICD code correlations for social_deprivation
+2025-04-11 16:08:41,948 - INFO - Stored Questionaire_log correlations for social_deprivation
+2025-04-11 16:28:33,875 - INFO - Stored Questionaire_lin correlations for social_deprivation
+2025-04-11 16:30:59,194 - INFO - Calculated new prevalences
+2025-04-11 16:31:08,193 - INFO - Stored new prevalences.
+2025-04-11 16:31:09,928 - INFO - Stored new prs: social_trust
+2025-04-11 17:46:42,352 - INFO - Stored Metabolite correlations for social_trust
+2025-04-11 17:47:50,246 - INFO - Stored Phecode correlations for social_trust
+2025-04-11 17:49:24,375 - INFO - Stored ICD code correlations for social_trust
+2025-04-11 17:49:26,747 - INFO - Stored Questionaire_log correlations for social_trust
+2025-04-11 18:09:17,304 - INFO - Stored Questionaire_lin correlations for social_trust
+2025-04-11 18:11:43,031 - INFO - Calculated new prevalences
+2025-04-11 18:11:49,410 - INFO - Stored new prevalences.
+2025-04-11 18:11:51,963 - INFO - Stored new prs: egfr
+2025-04-11 19:29:06,355 - INFO - Stored Metabolite correlations for egfr
+2025-04-11 19:30:11,857 - INFO - Stored Phecode correlations for egfr
+2025-04-11 19:31:55,823 - INFO - Stored ICD code correlations for egfr
+2025-04-11 19:31:58,501 - INFO - Stored Questionaire_log correlations for egfr
+2025-04-11 19:51:52,581 - INFO - Stored Questionaire_lin correlations for egfr
+2025-04-11 19:54:16,828 - INFO - Calculated new prevalences
+2025-04-11 19:54:24,588 - INFO - Stored new prevalences.
+2025-04-11 19:54:27,011 - INFO - Stored new prs: fractures
+2025-04-11 21:10:18,697 - INFO - Stored Metabolite correlations for fractures
+2025-04-11 21:11:25,636 - INFO - Stored Phecode correlations for fractures
+2025-04-11 21:12:59,378 - INFO - Stored ICD code correlations for fractures
+2025-04-11 21:13:01,961 - INFO - Stored Questionaire_log correlations for fractures
+2025-04-11 21:32:52,955 - INFO - Stored Questionaire_lin correlations for fractures
+2025-04-11 21:35:19,345 - INFO - Calculated new prevalences
+2025-04-11 21:35:27,370 - INFO - Stored new prevalences.
+2025-04-11 21:35:29,742 - INFO - Stored new prs: asthma
+2025-04-11 22:52:12,003 - INFO - Stored Metabolite correlations for asthma
+2025-04-11 22:53:18,546 - INFO - Stored Phecode correlations for asthma
+2025-04-11 22:54:55,972 - INFO - Stored ICD code correlations for asthma
+2025-04-11 22:54:58,703 - INFO - Stored Questionaire_log correlations for asthma
+2025-04-11 23:14:52,813 - INFO - Stored Questionaire_lin correlations for asthma
+2025-04-11 23:17:19,067 - INFO - Calculated new prevalences
+2025-04-11 23:17:25,656 - INFO - Stored new prevalences.
+2025-04-11 23:17:28,801 - INFO - Stored new prs: ectopic_pregnancy
+2025-04-12 00:33:31,343 - INFO - Stored Metabolite correlations for ectopic_pregnancy
+2025-04-12 00:34:38,602 - INFO - Stored Phecode correlations for ectopic_pregnancy
+2025-04-12 00:36:13,701 - INFO - Stored ICD code correlations for ectopic_pregnancy
+2025-04-12 00:36:16,176 - INFO - Stored Questionaire_log correlations for ectopic_pregnancy
+2025-04-12 00:56:02,147 - INFO - Stored Questionaire_lin correlations for ectopic_pregnancy
+2025-04-12 00:58:28,152 - INFO - Calculated new prevalences
+2025-04-12 00:58:36,022 - INFO - Stored new prevalences.
+2025-04-12 00:58:38,885 - INFO - Stored new prs: cad
+2025-04-12 02:13:41,603 - INFO - Stored Metabolite correlations for cad
+2025-04-12 02:14:45,979 - INFO - Stored Phecode correlations for cad
+2025-04-12 02:16:19,633 - INFO - Stored ICD code correlations for cad
+2025-04-12 02:16:22,064 - INFO - Stored Questionaire_log correlations for cad
+2025-04-12 02:36:06,489 - INFO - Stored Questionaire_lin correlations for cad
+2025-04-12 02:38:33,411 - INFO - Calculated new prevalences
+2025-04-12 02:38:40,199 - INFO - Stored new prevalences.
+2025-04-12 02:38:43,095 - INFO - Stored new prs: lc_n1
+2025-04-12 03:55:24,130 - INFO - Stored Metabolite correlations for lc_n1
+2025-04-12 03:56:29,029 - INFO - Stored Phecode correlations for lc_n1
+2025-04-12 03:58:04,745 - INFO - Stored ICD code correlations for lc_n1
+2025-04-12 03:58:07,405 - INFO - Stored Questionaire_log correlations for lc_n1
+2025-04-12 04:18:02,547 - INFO - Stored Questionaire_lin correlations for lc_n1
+2025-04-12 04:20:28,408 - INFO - Calculated new prevalences
+2025-04-12 04:20:38,440 - INFO - Stored new prevalences.
+2025-04-12 04:20:40,026 - INFO - Stored new prs: telomere_pc1
+2025-04-12 05:36:43,574 - INFO - Stored Metabolite correlations for telomere_pc1
+2025-04-12 05:37:49,906 - INFO - Stored Phecode correlations for telomere_pc1
+2025-04-12 05:39:21,487 - INFO - Stored ICD code correlations for telomere_pc1
+2025-04-12 05:39:23,712 - INFO - Stored Questionaire_log correlations for telomere_pc1
+2025-04-12 05:59:16,652 - INFO - Stored Questionaire_lin correlations for telomere_pc1
+2025-04-12 06:01:44,974 - INFO - Calculated new prevalences
+2025-04-12 06:01:48,529 - INFO - Stored new prevalences.
+2025-04-12 06:01:50,294 - INFO - Stored new prs: heart_failure
+2025-04-12 07:18:31,385 - INFO - Stored Metabolite correlations for heart_failure
+2025-04-12 07:19:40,094 - INFO - Stored Phecode correlations for heart_failure
+2025-04-12 07:21:12,402 - INFO - Stored ICD code correlations for heart_failure
+2025-04-12 07:21:14,707 - INFO - Stored Questionaire_log correlations for heart_failure
+2025-04-12 07:40:53,051 - INFO - Stored Questionaire_lin correlations for heart_failure
+2025-04-12 07:43:19,073 - INFO - Calculated new prevalences
+2025-04-12 07:43:23,343 - INFO - Stored new prevalences.
+2025-04-12 07:43:25,947 - INFO - Stored new prs: frailty
+2025-04-12 09:00:19,585 - INFO - Stored Metabolite correlations for frailty
+2025-04-12 09:01:32,841 - INFO - Stored Phecode correlations for frailty
+2025-04-12 09:03:06,956 - INFO - Stored ICD code correlations for frailty
+2025-04-12 09:03:09,462 - INFO - Stored Questionaire_log correlations for frailty
+2025-04-12 09:22:48,544 - INFO - Stored Questionaire_lin correlations for frailty
+2025-04-12 09:25:18,244 - INFO - Calculated new prevalences
+2025-04-12 09:25:24,893 - INFO - Stored new prevalences.
+2025-04-12 09:25:27,006 - INFO - Stored new prs: cpd
+2025-04-12 10:41:55,109 - INFO - Stored Metabolite correlations for cpd
+2025-04-12 10:43:12,534 - INFO - Stored Phecode correlations for cpd
+2025-04-12 10:44:44,454 - INFO - Stored ICD code correlations for cpd
+2025-04-12 10:44:46,917 - INFO - Stored Questionaire_log correlations for cpd
+2025-04-12 11:04:22,237 - INFO - Stored Questionaire_lin correlations for cpd
+2025-04-12 11:06:50,544 - INFO - Calculated new prevalences
+2025-04-12 11:06:55,011 - INFO - Stored new prevalences.
+2025-04-12 11:06:57,644 - INFO - Stored new prs: parkinson
+2025-04-12 12:22:25,044 - INFO - Stored Metabolite correlations for parkinson
+2025-04-12 12:23:35,594 - INFO - Stored Phecode correlations for parkinson
+2025-04-12 12:25:08,361 - INFO - Stored ICD code correlations for parkinson
+2025-04-12 12:25:10,743 - INFO - Stored Questionaire_log correlations for parkinson
+2025-04-12 12:44:57,776 - INFO - Stored Questionaire_lin correlations for parkinson
+2025-04-12 12:47:29,364 - INFO - Calculated new prevalences
+2025-04-12 12:47:33,663 - INFO - Stored new prevalences.
+2025-04-12 12:47:36,496 - INFO - Stored new prs: fev1_fvc
+2025-04-12 14:04:13,458 - INFO - Stored Metabolite correlations for fev1_fvc
+2025-04-12 14:05:20,441 - INFO - Stored Phecode correlations for fev1_fvc
+2025-04-12 14:06:52,410 - INFO - Stored ICD code correlations for fev1_fvc
+2025-04-12 14:06:54,703 - INFO - Stored Questionaire_log correlations for fev1_fvc
+2025-04-12 14:26:45,503 - INFO - Stored Questionaire_lin correlations for fev1_fvc
+2025-04-12 14:29:13,759 - INFO - Calculated new prevalences
+2025-04-12 14:29:17,844 - INFO - Stored new prevalences.
+2025-04-12 14:29:20,292 - INFO - Stored new prs: bankssts_cortical
+2025-04-12 15:44:58,420 - INFO - Stored Metabolite correlations for bankssts_cortical
+2025-04-12 15:46:05,774 - INFO - Stored Phecode correlations for bankssts_cortical
+2025-04-12 15:47:40,565 - INFO - Stored ICD code correlations for bankssts_cortical
+2025-04-12 15:47:42,954 - INFO - Stored Questionaire_log correlations for bankssts_cortical
+2025-04-12 16:07:20,037 - INFO - Stored Questionaire_lin correlations for bankssts_cortical
+2025-04-12 16:09:50,235 - INFO - Calculated new prevalences
+2025-04-12 16:09:54,838 - INFO - Stored new prevalences.
+2025-04-12 16:09:57,516 - INFO - Stored new prs: diet_sugar
+2025-04-12 17:24:53,050 - INFO - Stored Metabolite correlations for diet_sugar
+2025-04-12 17:26:04,479 - INFO - Stored Phecode correlations for diet_sugar
+2025-04-12 17:27:37,160 - INFO - Stored ICD code correlations for diet_sugar
+2025-04-12 17:27:39,943 - INFO - Stored Questionaire_log correlations for diet_sugar
+2025-04-12 17:47:16,331 - INFO - Stored Questionaire_lin correlations for diet_sugar
+2025-04-12 17:49:49,088 - INFO - Calculated new prevalences
+2025-04-12 17:49:54,315 - INFO - Stored new prevalences.
+2025-04-12 17:49:58,304 - INFO - Stored new prs: ckd
+2025-04-12 19:05:09,860 - INFO - Stored Metabolite correlations for ckd
+2025-04-12 19:06:25,188 - INFO - Stored Phecode correlations for ckd
+2025-04-12 19:07:56,902 - INFO - Stored ICD code correlations for ckd
+2025-04-12 19:07:59,344 - INFO - Stored Questionaire_log correlations for ckd
+2025-04-12 19:27:39,035 - INFO - Stored Questionaire_lin correlations for ckd
+2025-04-12 19:30:08,239 - INFO - Calculated new prevalences
+2025-04-12 19:30:14,065 - INFO - Stored new prevalences.
+2025-04-12 19:30:18,977 - INFO - Stored new prs: lc_w1
+2025-04-12 20:45:20,971 - INFO - Stored Metabolite correlations for lc_w1
+2025-04-12 20:46:29,343 - INFO - Stored Phecode correlations for lc_w1
+2025-04-12 20:48:07,725 - INFO - Stored ICD code correlations for lc_w1
+2025-04-12 20:48:10,236 - INFO - Stored Questionaire_log correlations for lc_w1
+2025-04-12 21:08:03,680 - INFO - Stored Questionaire_lin correlations for lc_w1
+2025-04-12 21:10:36,010 - INFO - Calculated new prevalences
+2025-04-12 21:10:42,358 - INFO - Stored new prevalences.
+2025-04-12 21:10:45,328 - INFO - Stored new prs: mvage
+2025-04-12 22:27:04,840 - INFO - Stored Metabolite correlations for mvage
+2025-04-12 22:28:09,424 - INFO - Stored Phecode correlations for mvage
+2025-04-12 22:29:43,164 - INFO - Stored ICD code correlations for mvage
+2025-04-12 22:29:45,788 - INFO - Stored Questionaire_log correlations for mvage
+2025-04-12 22:49:45,421 - INFO - Stored Questionaire_lin correlations for mvage
+2025-04-12 22:52:15,613 - INFO - Calculated new prevalences
+2025-04-12 22:52:20,385 - INFO - Stored new prevalences.
+2025-04-12 22:52:23,849 - INFO - Stored new prs: diet_prot
+2025-04-13 00:08:33,405 - INFO - Stored Metabolite correlations for diet_prot
+2025-04-13 00:09:37,661 - INFO - Stored Phecode correlations for diet_prot
+2025-04-13 00:11:10,241 - INFO - Stored ICD code correlations for diet_prot
+2025-04-13 00:11:12,793 - INFO - Stored Questionaire_log correlations for diet_prot
+2025-04-13 00:30:58,549 - INFO - Stored Questionaire_lin correlations for diet_prot
+2025-04-13 00:33:29,417 - INFO - Calculated new prevalences
+2025-04-13 00:33:34,773 - INFO - Stored new prevalences.
+2025-04-13 00:33:38,300 - INFO - Stored new prs: ea4
+2025-04-13 01:50:44,192 - INFO - Stored Metabolite correlations for ea4
+2025-04-13 01:51:46,696 - INFO - Stored Phecode correlations for ea4
+2025-04-13 01:53:18,811 - INFO - Stored ICD code correlations for ea4
+2025-04-13 01:53:21,306 - INFO - Stored Questionaire_log correlations for ea4
+2025-04-13 02:13:09,159 - INFO - Stored Questionaire_lin correlations for ea4
+2025-04-13 02:15:38,593 - INFO - Calculated new prevalences
+2025-04-13 02:15:42,917 - INFO - Stored new prevalences.
+2025-04-13 02:15:46,759 - INFO - Stored new prs: t2d
+2025-04-13 03:31:55,466 - INFO - Stored Metabolite correlations for t2d
+2025-04-13 03:32:58,487 - INFO - Stored Phecode correlations for t2d
+2025-04-13 03:34:31,550 - INFO - Stored ICD code correlations for t2d
+2025-04-13 03:34:34,051 - INFO - Stored Questionaire_log correlations for t2d
+2025-04-13 03:54:14,299 - INFO - Stored Questionaire_lin correlations for t2d
+2025-04-13 03:56:44,405 - INFO - Calculated new prevalences
+2025-04-13 03:56:49,297 - INFO - Stored new prevalences.
+2025-04-13 03:56:53,040 - INFO - Stored new prs: coffee
+2025-04-13 05:12:24,305 - INFO - Stored Metabolite correlations for coffee
+2025-04-13 05:13:27,357 - INFO - Stored Phecode correlations for coffee
+2025-04-13 05:14:59,629 - INFO - Stored ICD code correlations for coffee
+2025-04-13 05:15:02,419 - INFO - Stored Questionaire_log correlations for coffee
+2025-04-13 05:34:57,738 - INFO - Stored Questionaire_lin correlations for coffee
+2025-04-13 05:37:27,584 - INFO - Calculated new prevalences
+2025-04-13 05:37:31,833 - INFO - Stored new prevalences.
+2025-04-13 05:37:34,418 - INFO - Stored new prs: loss_x_cont
+2025-04-13 06:53:10,893 - INFO - Stored Metabolite correlations for loss_x_cont
+2025-04-13 06:54:13,731 - INFO - Stored Phecode correlations for loss_x_cont
+2025-04-13 06:55:47,134 - INFO - Stored ICD code correlations for loss_x_cont
+2025-04-13 06:55:49,757 - INFO - Stored Questionaire_log correlations for loss_x_cont
+2025-04-13 07:15:30,141 - INFO - Stored Questionaire_lin correlations for loss_x_cont
+2025-04-13 07:18:00,964 - INFO - Calculated new prevalences
+2025-04-13 07:18:05,655 - INFO - Stored new prevalences.
+2025-04-13 07:18:09,212 - INFO - Stored new prs: skull_bmd
+2025-04-13 08:35:38,994 - INFO - Stored Metabolite correlations for skull_bmd
+2025-04-13 08:36:42,115 - INFO - Stored Phecode correlations for skull_bmd
+2025-04-13 08:38:15,228 - INFO - Stored ICD code correlations for skull_bmd
+2025-04-13 08:38:17,701 - INFO - Stored Questionaire_log correlations for skull_bmd
+2025-04-13 08:58:11,168 - INFO - Stored Questionaire_lin correlations for skull_bmd
+2025-04-13 09:00:42,452 - INFO - Calculated new prevalences
+2025-04-13 09:00:46,896 - INFO - Stored new prevalences.
+2025-04-13 09:00:49,921 - INFO - Stored new prs: dupuytren
+2025-04-13 10:17:38,082 - INFO - Stored Metabolite correlations for dupuytren
+2025-04-13 10:18:41,745 - INFO - Stored Phecode correlations for dupuytren
+2025-04-13 10:20:15,641 - INFO - Stored ICD code correlations for dupuytren
+2025-04-13 10:20:18,389 - INFO - Stored Questionaire_log correlations for dupuytren
+2025-04-13 10:40:12,399 - INFO - Stored Questionaire_lin correlations for dupuytren
+2025-04-13 10:42:43,886 - INFO - Calculated new prevalences
+2025-04-13 10:42:48,101 - INFO - Stored new prevalences.
+2025-04-13 10:42:51,386 - INFO - Stored new prs: migraine
+2025-04-13 11:58:25,925 - INFO - Stored Metabolite correlations for migraine
+2025-04-13 11:59:31,778 - INFO - Stored Phecode correlations for migraine
+2025-04-13 12:01:03,809 - INFO - Stored ICD code correlations for migraine
+2025-04-13 12:01:06,113 - INFO - Stored Questionaire_log correlations for migraine
+2025-04-13 12:21:10,251 - INFO - Stored Questionaire_lin correlations for migraine
+2025-04-13 12:23:42,286 - INFO - Calculated new prevalences
+2025-04-13 12:23:45,586 - INFO - Stored new prevalences.
+2025-04-13 12:23:47,407 - INFO - Stored new prs: bmd
+2025-04-13 13:40:00,599 - INFO - Stored Metabolite correlations for bmd
+2025-04-13 13:41:03,143 - INFO - Stored Phecode correlations for bmd
+2025-04-13 13:42:35,307 - INFO - Stored ICD code correlations for bmd
+2025-04-13 13:42:37,632 - INFO - Stored Questionaire_log correlations for bmd
+2025-04-13 14:02:30,944 - INFO - Stored Questionaire_lin correlations for bmd
+2025-04-13 14:05:03,137 - INFO - Calculated new prevalences
+2025-04-13 14:05:08,583 - INFO - Stored new prevalences.
+2025-04-13 14:05:11,511 - INFO - Stored new prs: ins_res
+2025-04-13 15:21:56,384 - INFO - Stored Metabolite correlations for ins_res
+2025-04-13 15:23:03,771 - INFO - Stored Phecode correlations for ins_res
+2025-04-13 15:24:37,757 - INFO - Stored ICD code correlations for ins_res
+2025-04-13 15:24:40,104 - INFO - Stored Questionaire_log correlations for ins_res
+2025-04-13 15:44:32,368 - INFO - Stored Questionaire_lin correlations for ins_res
+2025-04-13 15:47:07,934 - INFO - Calculated new prevalences
+2025-04-13 15:47:14,653 - INFO - Stored new prevalences.
+2025-04-13 15:47:18,055 - INFO - Stored new prs: cerebral
+2025-04-13 17:02:52,682 - INFO - Stored Metabolite correlations for cerebral
+2025-04-13 17:04:01,455 - INFO - Stored Phecode correlations for cerebral
+2025-04-13 17:05:35,987 - INFO - Stored ICD code correlations for cerebral
+2025-04-13 17:05:38,677 - INFO - Stored Questionaire_log correlations for cerebral
+2025-04-13 17:25:28,309 - INFO - Stored Questionaire_lin correlations for cerebral
+2025-04-13 17:28:01,943 - INFO - Calculated new prevalences
+2025-04-13 17:28:09,256 - INFO - Stored new prevalences.
+2025-04-13 17:28:12,098 - INFO - Stored new prs: copd
+2025-04-13 18:43:28,640 - INFO - Stored Metabolite correlations for copd
+2025-04-13 18:44:40,748 - INFO - Stored Phecode correlations for copd
+2025-04-13 18:46:13,550 - INFO - Stored ICD code correlations for copd
+2025-04-13 18:46:15,873 - INFO - Stored Questionaire_log correlations for copd
+2025-04-13 19:06:10,531 - INFO - Stored Questionaire_lin correlations for copd
+2025-04-13 19:08:50,235 - INFO - Calculated new prevalences
+2025-04-13 19:08:57,223 - INFO - Stored new prevalences.
+2025-04-13 19:09:00,425 - INFO - Stored new prs: neb
+2025-04-13 20:26:56,640 - INFO - Stored Metabolite correlations for neb
+2025-04-13 20:28:16,266 - INFO - Stored Phecode correlations for neb
+2025-04-13 20:29:49,226 - INFO - Stored ICD code correlations for neb
+2025-04-13 20:29:51,480 - INFO - Stored Questionaire_log correlations for neb
+2025-04-13 20:49:42,226 - INFO - Stored Questionaire_lin correlations for neb
+2025-04-13 20:52:23,621 - INFO - Calculated new prevalences
+2025-04-13 20:52:28,056 - INFO - Stored new prevalences.
+2025-04-13 20:52:31,053 - INFO - Stored new prs: hyperthyroidism
+2025-04-13 22:08:00,353 - INFO - Stored Metabolite correlations for hyperthyroidism
+2025-04-13 22:09:07,455 - INFO - Stored Phecode correlations for hyperthyroidism
+2025-04-13 22:10:40,396 - INFO - Stored ICD code correlations for hyperthyroidism
+2025-04-13 22:10:42,673 - INFO - Stored Questionaire_log correlations for hyperthyroidism
+2025-04-13 22:30:24,196 - INFO - Stored Questionaire_lin correlations for hyperthyroidism
+2025-04-13 22:32:59,205 - INFO - Calculated new prevalences
+2025-04-13 22:33:04,596 - INFO - Stored new prevalences.
+2025-04-13 22:33:16,676 - INFO - Stored new prs: caudalanteriorcingulate_cortical
+2025-04-13 23:49:19,124 - INFO - Stored Metabolite correlations for caudalanteriorcingulate_cortical
+2025-04-13 23:50:29,405 - INFO - Stored Phecode correlations for caudalanteriorcingulate_cortical
+2025-04-13 23:52:02,753 - INFO - Stored ICD code correlations for caudalanteriorcingulate_cortical
+2025-04-13 23:52:05,348 - INFO - Stored Questionaire_log correlations for caudalanteriorcingulate_cortical
+2025-04-14 00:12:01,579 - INFO - Stored Questionaire_lin correlations for caudalanteriorcingulate_cortical
+2025-04-14 00:14:36,225 - INFO - Calculated new prevalences
+2025-04-14 00:14:39,949 - INFO - Stored new prevalences.
+2025-04-14 00:14:42,649 - INFO - Stored new prs: prostate_cancer
+2025-04-14 01:31:20,000 - INFO - Stored Metabolite correlations for prostate_cancer
+2025-04-14 01:32:26,183 - INFO - Stored Phecode correlations for prostate_cancer
+2025-04-14 01:34:02,329 - INFO - Stored ICD code correlations for prostate_cancer
+2025-04-14 01:34:04,868 - INFO - Stored Questionaire_log correlations for prostate_cancer
+2025-04-14 01:53:43,845 - INFO - Stored Questionaire_lin correlations for prostate_cancer
+2025-04-14 01:56:18,561 - INFO - Calculated new prevalences
+2025-04-14 01:56:27,803 - INFO - Stored new prevalences.
+2025-04-14 01:56:31,885 - INFO - Stored new prs: carpal
+2025-04-14 03:13:04,956 - INFO - Stored Metabolite correlations for carpal
+2025-04-14 03:14:08,842 - INFO - Stored Phecode correlations for carpal
+2025-04-14 03:15:43,420 - INFO - Stored ICD code correlations for carpal
+2025-04-14 03:15:45,826 - INFO - Stored Questionaire_log correlations for carpal
+2025-04-14 03:35:29,373 - INFO - Stored Questionaire_lin correlations for carpal
+2025-04-14 03:38:02,615 - INFO - Calculated new prevalences
+2025-04-14 03:38:11,905 - INFO - Stored new prevalences.
+2025-04-14 03:38:15,975 - INFO - Stored new prs: p_age
+2025-04-14 04:55:13,657 - INFO - Stored Metabolite correlations for p_age
+2025-04-14 04:56:16,955 - INFO - Stored Phecode correlations for p_age
+2025-04-14 04:57:51,093 - INFO - Stored ICD code correlations for p_age
+2025-04-14 04:57:53,496 - INFO - Stored Questionaire_log correlations for p_age
+2025-04-14 05:17:43,904 - INFO - Stored Questionaire_lin correlations for p_age
+2025-04-14 05:20:16,001 - INFO - Calculated new prevalences
+2025-04-14 05:20:20,542 - INFO - Stored new prevalences.
+2025-04-14 05:20:24,328 - INFO - Stored new prs: forearm_fracture
+2025-04-14 06:35:19,430 - INFO - Stored Metabolite correlations for forearm_fracture
+2025-04-14 06:36:22,342 - INFO - Stored Phecode correlations for forearm_fracture
+2025-04-14 06:37:56,276 - INFO - Stored ICD code correlations for forearm_fracture
+2025-04-14 06:37:58,847 - INFO - Stored Questionaire_log correlations for forearm_fracture
+2025-04-14 06:57:46,688 - INFO - Stored Questionaire_lin correlations for forearm_fracture
+2025-04-14 07:00:22,119 - INFO - Calculated new prevalences
+2025-04-14 07:00:26,701 - INFO - Stored new prevalences.
+2025-04-14 07:00:31,022 - INFO - Stored new prs: ad
+2025-04-14 08:17:17,057 - INFO - Stored Metabolite correlations for ad
+2025-04-14 08:18:24,333 - INFO - Stored Phecode correlations for ad
+2025-04-14 08:19:59,814 - INFO - Stored ICD code correlations for ad
+2025-04-14 08:20:02,604 - INFO - Stored Questionaire_log correlations for ad
+2025-04-14 08:39:45,201 - INFO - Stored Questionaire_lin correlations for ad
+2025-04-14 08:42:22,175 - INFO - Calculated new prevalences
+2025-04-14 08:42:25,842 - INFO - Stored new prevalences.
+2025-04-14 08:42:30,949 - INFO - Stored new prs: acne
+2025-04-14 10:00:00,257 - INFO - Stored Metabolite correlations for acne
+2025-04-14 10:05:47,486 - INFO - Stored Phecode correlations for acne
+2025-04-14 10:13:01,446 - INFO - Stored ICD code correlations for acne
+2025-04-14 10:13:04,273 - INFO - Stored Questionaire_log correlations for acne
+2025-04-14 10:33:20,759 - INFO - Stored Questionaire_lin correlations for acne
+2025-04-14 10:36:51,651 - INFO - Calculated new prevalences
+2025-04-14 10:36:57,345 - INFO - Stored new prevalences.
+2025-04-14 10:37:45,235 - INFO - Stored new prs: dpw
+2025-04-14 11:57:08,523 - INFO - Stored Metabolite correlations for dpw
+2025-04-14 12:02:33,496 - INFO - Stored Phecode correlations for dpw
+2025-04-14 12:11:38,320 - INFO - Stored ICD code correlations for dpw
+2025-04-14 12:11:47,426 - INFO - Stored Questionaire_log correlations for dpw
+2025-04-14 12:32:10,277 - INFO - Stored Questionaire_lin correlations for dpw
+2025-04-14 12:36:02,290 - INFO - Calculated new prevalences
+2025-04-14 12:36:11,667 - INFO - Stored new prevalences.
+2025-04-14 12:37:02,932 - INFO - Stored new prs: ibd
+2025-04-14 14:03:24,515 - INFO - Stored Metabolite correlations for ibd
+2025-04-14 14:04:49,397 - INFO - Stored Phecode correlations for ibd
+2025-04-14 14:06:38,215 - INFO - Stored ICD code correlations for ibd
+2025-04-14 14:06:40,993 - INFO - Stored Questionaire_log correlations for ibd
+2025-04-14 14:29:31,866 - INFO - Stored Questionaire_lin correlations for ibd
+2025-04-14 14:32:42,369 - INFO - Calculated new prevalences
+2025-04-14 14:32:53,906 - INFO - Stored new prevalences.
+2025-04-14 14:32:57,915 - INFO - Stored new prs: asi
+2025-04-14 15:58:37,807 - INFO - Stored Metabolite correlations for asi
+2025-04-14 16:00:36,117 - INFO - Stored Phecode correlations for asi
+2025-04-14 16:02:31,501 - INFO - Stored ICD code correlations for asi
+2025-04-14 16:02:34,245 - INFO - Stored Questionaire_log correlations for asi
+2025-04-14 16:23:22,855 - INFO - Stored Questionaire_lin correlations for asi
+2025-04-14 16:26:27,068 - INFO - Calculated new prevalences
+2025-04-14 16:26:33,705 - INFO - Stored new prevalences.
+2025-04-14 16:26:44,210 - INFO - Stored new prs: osteoarthritis
+2025-04-14 17:55:02,726 - INFO - Stored Metabolite correlations for osteoarthritis
+2025-04-14 17:56:17,769 - INFO - Stored Phecode correlations for osteoarthritis
+2025-04-14 17:57:58,123 - INFO - Stored ICD code correlations for osteoarthritis
+2025-04-14 17:58:01,209 - INFO - Stored Questionaire_log correlations for osteoarthritis
+2025-04-14 18:19:59,954 - INFO - Stored Questionaire_lin correlations for osteoarthritis
+2025-04-14 18:22:47,302 - INFO - Calculated new prevalences
+2025-04-14 18:22:53,095 - INFO - Stored new prevalences.
+2025-04-14 18:22:55,806 - INFO - Stored new prs: influenza
+2025-04-14 19:50:41,237 - INFO - Stored Metabolite correlations for influenza
+2025-04-14 19:51:55,853 - INFO - Stored Phecode correlations for influenza
+2025-04-14 19:53:32,204 - INFO - Stored ICD code correlations for influenza
+2025-04-14 19:53:34,837 - INFO - Stored Questionaire_log correlations for influenza
+2025-04-14 20:16:30,534 - INFO - Stored Questionaire_lin correlations for influenza
+2025-04-14 20:19:18,466 - INFO - Calculated new prevalences
+2025-04-14 20:19:26,532 - INFO - Stored new prevalences.
+2025-04-14 20:19:29,784 - INFO - Stored new prs: telomere_pc2
+2025-04-14 21:48:16,213 - INFO - Stored Metabolite correlations for telomere_pc2
+2025-04-14 21:49:28,276 - INFO - Stored Phecode correlations for telomere_pc2
+2025-04-14 21:51:03,767 - INFO - Stored ICD code correlations for telomere_pc2
+2025-04-14 21:51:06,313 - INFO - Stored Questionaire_log correlations for telomere_pc2
+2025-04-14 22:13:05,248 - INFO - Stored Questionaire_lin correlations for telomere_pc2
+2025-04-14 22:15:49,737 - INFO - Calculated new prevalences
+2025-04-14 22:15:55,857 - INFO - Stored new prevalences.
+2025-04-14 22:15:59,040 - INFO - Stored new prs: adhd
+2025-04-14 23:44:12,557 - INFO - Stored Metabolite correlations for adhd
+2025-04-14 23:45:22,964 - INFO - Stored Phecode correlations for adhd
+2025-04-14 23:46:57,946 - INFO - Stored ICD code correlations for adhd
+2025-04-14 23:47:00,521 - INFO - Stored Questionaire_log correlations for adhd
+2025-04-15 00:10:09,088 - INFO - Stored Questionaire_lin correlations for adhd
+2025-04-15 00:13:05,271 - INFO - Calculated new prevalences
+2025-04-15 00:13:12,136 - INFO - Stored new prevalences.
+2025-04-15 00:13:16,195 - INFO - Stored new prs: ra
+2025-04-15 01:44:17,404 - INFO - Stored Metabolite correlations for ra
+2025-04-15 01:45:26,648 - INFO - Stored Phecode correlations for ra
+2025-04-15 01:47:01,902 - INFO - Stored ICD code correlations for ra
+2025-04-15 01:47:04,742 - INFO - Stored Questionaire_log correlations for ra
+2025-04-15 02:11:27,019 - INFO - Stored Questionaire_lin correlations for ra
+2025-04-15 02:14:12,545 - INFO - Calculated new prevalences
+2025-04-15 02:14:18,454 - INFO - Stored new prevalences.
+2025-04-15 02:14:23,855 - INFO - Stored new prs: afb
+2025-04-15 03:48:07,334 - INFO - Stored Metabolite correlations for afb
+2025-04-15 03:49:14,669 - INFO - Stored Phecode correlations for afb
+2025-04-15 03:50:50,463 - INFO - Stored ICD code correlations for afb
+2025-04-15 03:50:52,820 - INFO - Stored Questionaire_log correlations for afb
+2025-04-15 04:15:04,504 - INFO - Stored Questionaire_lin correlations for afb
+2025-04-15 04:17:45,079 - INFO - Calculated new prevalences
+2025-04-15 04:17:49,797 - INFO - Stored new prevalences.
+2025-04-15 04:17:54,632 - INFO - Stored new prs: estradiol
+2025-04-15 05:50:11,592 - INFO - Stored Metabolite correlations for estradiol
+2025-04-15 05:51:18,187 - INFO - Stored Phecode correlations for estradiol
+2025-04-15 05:52:54,689 - INFO - Stored ICD code correlations for estradiol
+2025-04-15 05:52:57,749 - INFO - Stored Questionaire_log correlations for estradiol
+2025-04-15 06:17:21,720 - INFO - Stored Questionaire_lin correlations for estradiol
+2025-04-15 06:20:03,939 - INFO - Calculated new prevalences
+2025-04-15 06:20:09,101 - INFO - Stored new prevalences.
+2025-04-15 06:20:13,286 - INFO - Stored new prs: myasthenia
+2025-04-15 07:53:19,255 - INFO - Stored Metabolite correlations for myasthenia
+2025-04-15 07:54:27,454 - INFO - Stored Phecode correlations for myasthenia
+2025-04-15 07:56:03,431 - INFO - Stored ICD code correlations for myasthenia
+2025-04-15 07:56:06,641 - INFO - Stored Questionaire_log correlations for myasthenia
+2025-04-15 08:20:03,013 - INFO - Stored Questionaire_lin correlations for myasthenia
+2025-04-15 08:22:49,675 - INFO - Calculated new prevalences
+2025-04-15 08:22:55,078 - INFO - Stored new prevalences.
+2025-04-15 08:23:00,684 - INFO - Stored new prs: estrone
+2025-04-15 09:54:31,844 - INFO - Stored Metabolite correlations for estrone
+2025-04-15 09:55:40,404 - INFO - Stored Phecode correlations for estrone
+2025-04-15 09:57:18,047 - INFO - Stored ICD code correlations for estrone
+2025-04-15 09:57:20,895 - INFO - Stored Questionaire_log correlations for estrone
+2025-04-15 10:21:47,764 - INFO - Stored Questionaire_lin correlations for estrone
+2025-04-15 10:24:32,809 - INFO - Calculated new prevalences
+2025-04-15 10:24:38,423 - INFO - Stored new prevalences.
+2025-04-15 10:24:44,059 - INFO - Stored new prs: insomnia
+2025-04-15 11:56:53,898 - INFO - Stored Metabolite correlations for insomnia
+2025-04-15 11:58:01,328 - INFO - Stored Phecode correlations for insomnia
+2025-04-15 11:59:41,201 - INFO - Stored ICD code correlations for insomnia
+2025-04-15 11:59:44,345 - INFO - Stored Questionaire_log correlations for insomnia
+2025-04-15 12:25:09,316 - INFO - Stored Questionaire_lin correlations for insomnia
+2025-04-15 12:28:00,141 - INFO - Calculated new prevalences
+2025-04-15 12:28:05,703 - INFO - Stored new prevalences.
+2025-04-15 12:28:11,770 - INFO - Stored new prs: bmi
+2025-04-15 14:01:26,184 - INFO - Stored Metabolite correlations for bmi
+2025-04-15 14:02:31,736 - INFO - Stored Phecode correlations for bmi
+2025-04-15 14:04:07,565 - INFO - Stored ICD code correlations for bmi
+2025-04-15 14:04:10,273 - INFO - Stored Questionaire_log correlations for bmi
+2025-04-15 14:27:04,890 - INFO - Stored Questionaire_lin correlations for bmi
+2025-04-15 14:29:51,553 - INFO - Calculated new prevalences
+2025-04-15 14:29:57,580 - INFO - Stored new prevalences.
+2025-04-15 14:30:03,520 - INFO - Stored new prs: thyroid_levels
+2025-04-15 15:59:43,106 - INFO - Stored Metabolite correlations for thyroid_levels
+2025-04-15 16:00:50,098 - INFO - Stored Phecode correlations for thyroid_levels
+2025-04-15 16:02:27,284 - INFO - Stored ICD code correlations for thyroid_levels
+2025-04-15 16:02:30,048 - INFO - Stored Questionaire_log correlations for thyroid_levels
+2025-04-15 16:25:47,556 - INFO - Stored Questionaire_lin correlations for thyroid_levels
+2025-04-15 16:28:35,878 - INFO - Calculated new prevalences
+2025-04-15 16:28:41,280 - INFO - Stored new prevalences.
+2025-04-15 16:28:44,896 - INFO - Stored new prs: stroke
+2025-04-15 17:54:26,746 - INFO - Stored Metabolite correlations for stroke
+2025-04-15 17:55:32,349 - INFO - Stored Phecode correlations for stroke
+2025-04-15 17:57:05,855 - INFO - Stored ICD code correlations for stroke
+2025-04-15 17:57:08,397 - INFO - Stored Questionaire_log correlations for stroke
+2025-04-15 18:17:11,306 - INFO - Stored Questionaire_lin correlations for stroke
+2025-04-15 18:19:54,391 - INFO - Calculated new prevalences
+2025-04-15 18:20:00,465 - INFO - Stored new prevalences.
+2025-04-15 18:20:06,370 - INFO - Stored new prs: healthy_diet
+2025-04-15 19:36:28,444 - INFO - Stored Metabolite correlations for healthy_diet
+2025-04-15 19:37:33,868 - INFO - Stored Phecode correlations for healthy_diet
+2025-04-15 19:39:15,268 - INFO - Stored ICD code correlations for healthy_diet
+2025-04-15 19:39:17,977 - INFO - Stored Questionaire_log correlations for healthy_diet
+2025-04-15 19:59:22,368 - INFO - Stored Questionaire_lin correlations for healthy_diet
+2025-04-15 20:02:05,618 - INFO - Calculated new prevalences
+2025-04-15 20:02:13,464 - INFO - Stored new prevalences.
+2025-04-15 20:02:19,510 - INFO - Stored new prs: t1d
+2025-04-15 21:18:39,645 - INFO - Stored Metabolite correlations for t1d
+2025-04-15 21:19:53,166 - INFO - Stored Phecode correlations for t1d
+2025-04-15 21:21:29,823 - INFO - Stored ICD code correlations for t1d
+2025-04-15 21:21:32,232 - INFO - Stored Questionaire_log correlations for t1d
+2025-04-15 21:41:32,209 - INFO - Stored Questionaire_lin correlations for t1d
+2025-04-15 21:44:15,424 - INFO - Calculated new prevalences
+2025-04-15 21:44:21,212 - INFO - Stored new prevalences.
+2025-04-15 21:44:42,318 - INFO - Stored new prs: menopausal_vasomotor
+2025-04-15 23:00:04,130 - INFO - Stored Metabolite correlations for menopausal_vasomotor
+2025-04-15 23:01:10,764 - INFO - Stored Phecode correlations for menopausal_vasomotor
+2025-04-15 23:02:44,387 - INFO - Stored ICD code correlations for menopausal_vasomotor
+2025-04-15 23:02:46,951 - INFO - Stored Questionaire_log correlations for menopausal_vasomotor
+2025-04-15 23:22:50,317 - INFO - Stored Questionaire_lin correlations for menopausal_vasomotor
+2025-04-15 23:25:34,700 - INFO - Calculated new prevalences
+2025-04-15 23:25:41,796 - INFO - Stored new prevalences.
+2025-04-15 23:25:50,243 - INFO - Stored new prs: endometriosis
+2025-04-16 00:42:22,805 - INFO - Stored Metabolite correlations for endometriosis
+2025-04-16 00:43:39,337 - INFO - Stored Phecode correlations for endometriosis
+2025-04-16 00:45:26,869 - INFO - Stored ICD code correlations for endometriosis
+2025-04-16 00:45:31,086 - INFO - Stored Questionaire_log correlations for endometriosis
+2025-04-16 01:05:33,943 - INFO - Stored Questionaire_lin correlations for endometriosis
+2025-04-16 01:08:24,306 - INFO - Calculated new prevalences
+2025-04-16 01:08:27,973 - INFO - Stored new prevalences.
+2025-04-16 01:08:34,604 - INFO - Stored new prs: fibromyalgia
+2025-04-16 02:24:36,381 - INFO - Stored Metabolite correlations for fibromyalgia
+2025-04-16 02:25:39,508 - INFO - Stored Phecode correlations for fibromyalgia
+2025-04-16 02:27:11,511 - INFO - Stored ICD code correlations for fibromyalgia
+2025-04-16 02:27:13,725 - INFO - Stored Questionaire_log correlations for fibromyalgia
+2025-04-16 02:47:10,635 - INFO - Stored Questionaire_lin correlations for fibromyalgia
+2025-04-16 02:49:50,435 - INFO - Calculated new prevalences
+2025-04-16 02:49:53,352 - INFO - Stored new prevalences.
+2025-04-16 02:49:56,156 - INFO - Stored new prs: antisocial
+2025-04-16 04:07:03,553 - INFO - Stored Metabolite correlations for antisocial
+2025-04-16 04:08:03,876 - INFO - Stored Phecode correlations for antisocial
+2025-04-16 04:09:36,523 - INFO - Stored ICD code correlations for antisocial
+2025-04-16 04:09:38,816 - INFO - Stored Questionaire_log correlations for antisocial
+2025-04-16 04:29:25,274 - INFO - Stored Questionaire_lin correlations for antisocial
+2025-04-16 04:32:06,946 - INFO - Calculated new prevalences
+2025-04-16 04:32:09,746 - INFO - Stored new prevalences.
+2025-04-16 04:32:12,582 - INFO - Stored new prs: skeletal_age
+2025-04-16 05:48:03,378 - INFO - Stored Metabolite correlations for skeletal_age
+2025-04-16 05:49:03,478 - INFO - Stored Phecode correlations for skeletal_age
+2025-04-16 05:50:36,118 - INFO - Stored ICD code correlations for skeletal_age
+2025-04-16 05:50:38,387 - INFO - Stored Questionaire_log correlations for skeletal_age
+2025-04-16 06:10:35,041 - INFO - Stored Questionaire_lin correlations for skeletal_age
+2025-04-16 06:13:14,207 - INFO - Calculated new prevalences
+2025-04-16 06:13:17,031 - INFO - Stored new prevalences.
+2025-04-16 06:13:19,245 - INFO - Stored new prs: nafld
+2025-04-16 07:29:30,824 - INFO - Stored Metabolite correlations for nafld
+2025-04-16 07:30:31,264 - INFO - Stored Phecode correlations for nafld
+2025-04-16 07:32:03,845 - INFO - Stored ICD code correlations for nafld
+2025-04-16 07:32:06,125 - INFO - Stored Questionaire_log correlations for nafld
+2025-04-16 07:52:10,281 - INFO - Stored Questionaire_lin correlations for nafld
+2025-04-16 07:54:49,631 - INFO - Calculated new prevalences
+2025-04-16 07:54:52,597 - INFO - Stored new prevalences.
+2025-04-16 07:54:55,577 - INFO - Stored new prs: atopic_dermatitis
+2025-04-16 09:11:12,499 - INFO - Stored Metabolite correlations for atopic_dermatitis
+2025-04-16 09:12:16,883 - INFO - Stored Phecode correlations for atopic_dermatitis
+2025-04-16 09:13:49,568 - INFO - Stored ICD code correlations for atopic_dermatitis
+2025-04-16 09:13:51,893 - INFO - Stored Questionaire_log correlations for atopic_dermatitis
+2025-04-16 09:33:45,094 - INFO - Stored Questionaire_lin correlations for atopic_dermatitis
+2025-04-16 09:36:25,466 - INFO - Calculated new prevalences
+2025-04-16 09:36:28,427 - INFO - Stored new prevalences.
+2025-04-16 09:36:31,360 - INFO - Stored new prs: age_menopause
+2025-04-16 10:52:37,780 - INFO - Stored Metabolite correlations for age_menopause
+2025-04-16 10:53:39,680 - INFO - Stored Phecode correlations for age_menopause
+2025-04-16 10:55:12,322 - INFO - Stored ICD code correlations for age_menopause
+2025-04-16 10:55:14,622 - INFO - Stored Questionaire_log correlations for age_menopause
+2025-04-16 11:15:18,957 - INFO - Stored Questionaire_lin correlations for age_menopause
+2025-04-16 11:17:58,896 - INFO - Calculated new prevalences
+2025-04-16 11:18:01,737 - INFO - Stored new prevalences.
+2025-04-16 11:18:04,760 - INFO - Stored new prs: poverty_factor
+2025-04-16 12:34:19,739 - INFO - Stored Metabolite correlations for poverty_factor
+2025-04-16 12:35:25,522 - INFO - Stored Phecode correlations for poverty_factor
+2025-04-16 12:36:58,832 - INFO - Stored ICD code correlations for poverty_factor
+2025-04-16 12:37:01,215 - INFO - Stored Questionaire_log correlations for poverty_factor
+2025-04-16 12:56:58,208 - INFO - Stored Questionaire_lin correlations for poverty_factor
+2025-04-16 12:59:50,122 - INFO - Calculated new prevalences
+2025-04-16 12:59:53,057 - INFO - Stored new prevalences.
+2025-04-16 12:59:57,949 - INFO - Stored new prs: epilepsy
+2025-04-16 14:16:23,091 - INFO - Stored Metabolite correlations for epilepsy
+2025-04-16 14:17:28,905 - INFO - Stored Phecode correlations for epilepsy
+2025-04-16 14:19:00,845 - INFO - Stored ICD code correlations for epilepsy
+2025-04-16 14:19:03,081 - INFO - Stored Questionaire_log correlations for epilepsy
+2025-04-16 14:39:08,169 - INFO - Stored Questionaire_lin correlations for epilepsy
+2025-04-16 14:41:55,207 - INFO - Calculated new prevalences
+2025-04-16 14:41:58,121 - INFO - Stored new prevalences.
+2025-04-16 14:42:00,940 - INFO - Stored new prs: cuneus_cortical
+2025-04-16 15:58:20,160 - INFO - Stored Metabolite correlations for cuneus_cortical
+2025-04-16 15:59:20,844 - INFO - Stored Phecode correlations for cuneus_cortical
+2025-04-16 16:00:53,732 - INFO - Stored ICD code correlations for cuneus_cortical
+2025-04-16 16:00:56,085 - INFO - Stored Questionaire_log correlations for cuneus_cortical
+2025-04-16 16:20:51,038 - INFO - Stored Questionaire_lin correlations for cuneus_cortical
+2025-04-16 16:23:32,256 - INFO - Calculated new prevalences
+2025-04-16 16:23:35,188 - INFO - Stored new prevalences.
+2025-04-16 16:23:38,654 - INFO - Stored new prs: cerebellar
+2025-04-16 17:40:00,342 - INFO - Stored Metabolite correlations for cerebellar
+2025-04-16 17:41:00,371 - INFO - Stored Phecode correlations for cerebellar
+2025-04-16 17:42:32,273 - INFO - Stored ICD code correlations for cerebellar
+2025-04-16 17:42:34,511 - INFO - Stored Questionaire_log correlations for cerebellar
+2025-04-16 18:02:30,333 - INFO - Stored Questionaire_lin correlations for cerebellar
+2025-04-16 18:05:10,183 - INFO - Calculated new prevalences
+2025-04-16 18:05:12,990 - INFO - Stored new prevalences.
+2025-04-29 09:58:50,500 - INFO - Loading pipeline data...
+2025-04-29 09:59:29,142 - INFO - Stored new metadata.
+2025-04-29 09:59:35,896 - INFO - Stored new prs: covid_r7_c2
+2025-04-29 10:00:44,260 - INFO - Loading pipeline data...
+2025-04-29 10:00:44,308 - INFO - Stored new metadata.
+2025-04-29 10:00:44,659 - INFO - Stored new prs: covid_r7_c2
+2025-04-29 11:19:18,281 - INFO - Stored Metabolite correlations for covid_r7_c2
+2025-04-29 11:20:20,844 - INFO - Stored Phecode correlations for covid_r7_c2
+2025-04-29 11:22:01,617 - INFO - Stored ICD code correlations for covid_r7_c2
+2025-04-29 11:22:04,094 - INFO - Stored Questionaire_log correlations for covid_r7_c2
+2025-04-29 11:43:22,392 - INFO - Stored Questionaire_lin correlations for covid_r7_c2
+2025-04-29 11:45:51,129 - INFO - Calculated new prevalences
+2025-04-29 11:45:54,109 - INFO - Stored new prevalences.
+2025-04-29 11:45:54,683 - INFO - Stored new prs: loss_x_binary
+2025-04-29 13:06:32,147 - INFO - Stored Metabolite correlations for loss_x_binary
+2025-04-29 13:07:40,014 - INFO - Stored Phecode correlations for loss_x_binary
+2025-04-29 13:09:12,957 - INFO - Stored ICD code correlations for loss_x_binary
+2025-04-29 13:09:15,246 - INFO - Stored Questionaire_log correlations for loss_x_binary
+2025-04-29 13:29:12,513 - INFO - Stored Questionaire_lin correlations for loss_x_binary
+2025-04-29 13:31:30,643 - INFO - Calculated new prevalences
+2025-04-29 13:31:36,615 - INFO - Stored new prevalences.
+2025-04-29 13:31:37,436 - INFO - Stored new prs: atrialfib
+2025-04-29 14:48:18,972 - INFO - Stored Metabolite correlations for atrialfib
+2025-04-29 14:49:26,017 - INFO - Stored Phecode correlations for atrialfib
+2025-04-29 14:50:59,526 - INFO - Stored ICD code correlations for atrialfib
+2025-04-29 14:51:01,860 - INFO - Stored Questionaire_log correlations for atrialfib
+2025-04-29 15:12:09,296 - INFO - Stored Questionaire_lin correlations for atrialfib
+2025-04-29 15:14:49,814 - INFO - Calculated new prevalences
+2025-04-29 15:14:55,763 - INFO - Stored new prevalences.
+2025-04-29 15:14:56,416 - INFO - Stored new prs: lc_n2
+2025-04-29 16:18:09,620 - INFO - Loading pipeline data...
+2025-04-29 16:18:26,556 - INFO - Stored new metadata.
+2025-04-29 16:18:27,018 - INFO - Stored new prs: covid_r7_c2
+2025-04-29 17:35:03,100 - INFO - Stored Metabolite correlations for covid_r7_c2
+2025-04-29 17:36:10,797 - INFO - Stored Phecode correlations for covid_r7_c2
+2025-04-29 17:38:07,293 - INFO - Stored ICD code correlations for covid_r7_c2
+2025-04-29 17:38:09,650 - INFO - Stored Questionaire_log correlations for covid_r7_c2
+2025-04-29 17:58:17,743 - INFO - Stored Questionaire_lin correlations for covid_r7_c2
+2025-04-29 18:00:45,154 - INFO - Calculated new prevalences
+2025-04-29 18:00:48,719 - INFO - Stored new prevalences.
+2025-04-29 18:00:49,955 - INFO - Stored new prs: an
+2025-04-29 19:17:43,264 - INFO - Stored Metabolite correlations for an
+2025-04-29 19:18:50,584 - INFO - Stored Phecode correlations for an
+2025-04-29 19:20:22,545 - INFO - Stored ICD code correlations for an
+2025-04-29 19:20:24,734 - INFO - Stored Questionaire_log correlations for an
+2025-04-29 19:40:23,783 - INFO - Stored Questionaire_lin correlations for an
+2025-04-29 19:42:51,238 - INFO - Calculated new prevalences
+2025-04-29 19:42:57,383 - INFO - Stored new prevalences.
+2025-04-29 19:42:59,926 - INFO - Stored new prs: covid_r7_a2
+2025-04-29 20:59:40,029 - INFO - Stored Metabolite correlations for covid_r7_a2
+2025-04-29 21:00:40,781 - INFO - Stored Phecode correlations for covid_r7_a2
+2025-04-29 21:02:13,361 - INFO - Stored ICD code correlations for covid_r7_a2
+2025-04-29 21:02:15,635 - INFO - Stored Questionaire_log correlations for covid_r7_a2
+2025-04-29 21:22:09,268 - INFO - Stored Questionaire_lin correlations for covid_r7_a2
+2025-04-29 21:24:28,489 - INFO - Calculated new prevalences
+2025-04-29 21:24:31,531 - INFO - Stored new prevalences.
+2025-04-29 21:24:32,229 - INFO - Stored new prs: scz
+2025-04-29 22:40:43,625 - INFO - Stored Metabolite correlations for scz
+2025-04-29 22:41:52,798 - INFO - Stored Phecode correlations for scz
+2025-04-29 22:43:24,793 - INFO - Stored ICD code correlations for scz
+2025-04-29 22:43:27,098 - INFO - Stored Questionaire_log correlations for scz
+2025-04-29 23:03:23,762 - INFO - Stored Questionaire_lin correlations for scz
+2025-04-29 23:05:49,219 - INFO - Calculated new prevalences
+2025-04-29 23:05:52,353 - INFO - Stored new prevalences.
+2025-04-29 23:05:53,874 - INFO - Stored new prs: bp
+2025-04-30 00:22:28,593 - INFO - Stored Metabolite correlations for bp
+2025-04-30 00:23:58,216 - INFO - Stored Phecode correlations for bp
+2025-04-30 00:25:30,968 - INFO - Stored ICD code correlations for bp
+2025-04-30 00:25:33,285 - INFO - Stored Questionaire_log correlations for bp
+2025-04-30 00:45:36,530 - INFO - Stored Questionaire_lin correlations for bp
+2025-04-30 00:48:02,343 - INFO - Calculated new prevalences
+2025-04-30 00:48:06,440 - INFO - Stored new prevalences.
+2025-04-30 00:48:08,217 - INFO - Stored new prs: adhd
+2025-04-30 02:05:33,727 - INFO - Stored Metabolite correlations for adhd
+2025-04-30 02:06:46,827 - INFO - Stored Phecode correlations for adhd
+2025-04-30 02:08:19,055 - INFO - Stored ICD code correlations for adhd
+2025-04-30 02:08:21,532 - INFO - Stored Questionaire_log correlations for adhd
+2025-04-30 02:28:12,428 - INFO - Stored Questionaire_lin correlations for adhd
+2025-04-30 02:30:37,239 - INFO - Calculated new prevalences
+2025-04-30 02:30:45,354 - INFO - Stored new prevalences.
+2025-04-30 02:30:47,694 - INFO - Stored new prs: asd
+2025-04-30 03:47:40,698 - INFO - Stored Metabolite correlations for asd
+2025-04-30 03:48:53,745 - INFO - Stored Phecode correlations for asd
+2025-04-30 03:50:27,249 - INFO - Stored ICD code correlations for asd
+2025-04-30 03:50:30,139 - INFO - Stored Questionaire_log correlations for asd
+2025-04-30 04:10:28,597 - INFO - Stored Questionaire_lin correlations for asd
+2025-04-30 04:12:50,734 - INFO - Calculated new prevalences
+2025-04-30 04:12:53,739 - INFO - Stored new prevalences.
