@@ -81,8 +81,8 @@ for dir in "$SOURCE_DIR"/*; do
 done
 
 # Update db
-#echo "Calculating regressions and prevalences..."
-#python "$SCRIPT" 0 0 1 1 &> "$LOG_FILE" 
-#echo "Pipeline completed!"
+echo "Calculating regressions and prevalences..."
+python "$SCRIPT" 0 0 1 1 &> "$LOG_FILE" 
+echo "Pipeline completed!"
 
 exit 0

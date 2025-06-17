@@ -91,6 +91,7 @@ def update_graph(disease_value, reference_value, division_value, tab):
                                                         db_handler.get_correlations(gwas, reference_value, division_value, target_type[1])], ignore_index=True)
     else: filtered_data = db_handler.get_correlations(gwas, reference_value, division_value, target_type)
 
+    filtered_data = filtered_data.dropna(subset=['P', 'CI_5', 'CI_95'])
     filtered_data = filtered_data.sort_values(by=['class', 'logpxdir'], ascending=[True, True])
 
     # Plotly figure based on filtered data
@@ -271,6 +272,7 @@ def update_table(disease_value, reference_value, division_value, tab):
                                                         db_handler.get_correlations(gwas, reference_value, division_value, target_type[1])], ignore_index=True)
     else: filtered_data = db_handler.get_correlations(gwas, reference_value, division_value, target_type)
 
+    filtered_data = filtered_data.dropna(subset=['P', 'CI_5', 'CI_95'])
     # Round numeric columns to 6 decimal places
     numeric_columns = filtered_data.select_dtypes(include=[np.number]).columns
     filtered_data[numeric_columns] = filtered_data[numeric_columns].round(6)
@@ -284,8 +286,7 @@ def update_table(disease_value, reference_value, division_value, tab):
     data_store = filtered_data.to_dict('records')
 
     return data_store, data_store  # Populate dash_table.DataTable and store data
-"""
-## uncomment to allow table download
+
 # Callback to handle file download
 @app.callback(
     Output("download-dataframe-excel", "data"),
@@ -307,7 +308,7 @@ def download_table(n_clicks, stored_data):
         with pd.ExcelWriter(bytes_io, engine="xlsxwriter") as writer:
             df.to_excel(writer, sheet_name="Sheet1", index=False)
     return dcc.send_bytes(to_excel, "polygenie-table_data.xlsx")
-"""
+
 def filter_values(unfiltered_data, disease_value, quartile_value, reference_value, division_value):
     """
     Function to filter the data according to the content of the filters
