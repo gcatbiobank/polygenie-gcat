@@ -21,8 +21,24 @@ sys.path.append(root_dir)
 
 from sqlitedb.db_handler import DBHandler
 
+# =========================
+# Constants
+# =========================
+
+ALPHA = 0.05
+LOESS_FRAC = 0.3
+
+PHEWAS_HEIGHT = 600
+PREVALENCE_HEIGHT = 300
+
+Y_CAP_PERCENTILE = 99
+
+# =========================
+# Initialize DB and App
+# =========================
+
 # Create a connection to the SQLite database
-database_file = "sqlitedb/polygenie.db"
+database_file = "db/polygenie.db"
 db_handler = DBHandler(database_file)
 
 # Create the Dash app
@@ -32,21 +48,9 @@ server = app.server
 app.title = "PolyGenie"
 print("App title is:", app.title)
 
-
-# Create dropdown options
-gwas_names = db_handler.get_gwas_names()
-disease_options = [{'label': disease, 'value': disease} for disease in gwas_names]
-
-# Rename the labels from the dropdown
-ref_values = ['low', 'low + intermediate']
-ref_labels = ['Bottom', 'Bottom and Middle']
-
-reference_options = [{'label': label, 'value': value} for label, value in zip(ref_labels, ref_values)]
-
-div_values = ['quartile', 'decile']
-div_labels = ['Quartiles', 'Deciles']
-
-division_options = [{'label': label, 'value': value} for label, value in zip(div_labels, div_values)]
+# =========================
+# Palette and Controls
+# =========================
 
 # Color palette definition
 palette = sns.color_palette("colorblind")
@@ -55,8 +59,59 @@ colorblind_palette_hex = [mcolors.to_hex(color) for color in palette]
 # Color palette graphs (Male, Female, All)
 colors = ["#90BAAD", "#FF6542", "#56667A"]
 
-col_headers = ['GWAS_code', "Code", 'Reference', 'Division', 'OR', 'CI_5', 'CI_95', 'P', 'R2', 'logpxdir', 'Description', 'Class', 'Type', 'GWAS']
-col_headers_tokeep = ['GWAS', "Code", 'Reference', 'Division', 'OR', 'CI_5', 'CI_95', 'P', 'R2', 'Description', 'Class', 'Type']
+# Create dropdown options
+gwas_names = db_handler.get_gwas_names()
+disease_options = [{'label': d, 'value': d} for d in gwas_names]
+
+reference_options = [
+    {'label': 'Bottom', 'value': 'low'},
+    {'label': 'Bottom and Middle', 'value': 'rest'},
+]
+
+# Default division options (will be updated based on PRS when possible)
+division_options = [{'label': '4 (quartiles)', 'value': '4'},
+                    {'label': '10 (deciles)', 'value': '10'}]
+
+# =========================
+# Targe classes for tabs
+# =========================
+
+# Build dynamic tabs from the DB's target classes
+_tc_df = db_handler.get_target_classes()
+
+target_classes = (
+    _tc_df['target_class'].astype(str).tolist()
+    if not _tc_df.empty
+    else ['Phecodes','ICD_codes','Metabolites','Questionnaire']
+)
+
+tabs_children = [dcc.Tab(label=tc, value=tc) for tc in target_classes]
+default_tab = target_classes[0] if target_classes else 'ICD_codes'
+
+
+col_headers = ['GWAS_code', 'Code', 'Reference', 'Division', 'Beta', 'OR', 'CI_5', 
+               'CI_95', 'P', 'R2', 'logpxdir', 'Description', 'Domain', 'Class', 'Type']
+col_headers_tokeep = ['GWAS_code', 'Code', 'Description', 'Domain', 'Beta', 'OR', 'CI_5', 'CI_95', 
+                      'P']
+
+def add_loess(fig, df, x, y, label, visible):
+    """Add a LOESS-smoothed line to a Plotly figure."""
+    if df.empty:
+        return
+
+    loess = sm.nonparametric.lowess(df[y], df[x], frac=LOESS_FRAC)
+
+    fig.add_trace(
+        go.Scatter(
+            x=loess[:, 0],
+            y=loess[:, 1],
+            mode='lines',
+            name=f'LOESS {label}',
+            line=dict(width=3),
+            visible=visible,
+            showlegend=True
+        )
+    )
 
 #####################################################################################################################
 ##################################################### Callbacks #####################################################
@@ -82,16 +137,20 @@ def update_graph(disease_value, reference_value, division_value, tab):
     :return: figure with the updated graph content
     """
     
-    target_type = get_target_type(tab)
+    target_class = tab
+
     if reference_value == "low + intermediate": reference_value = "rest"
 
     gwas = db_handler.get_gwas_code_from_name(disease_value)
 
-    if isinstance(target_type, tuple): filtered_data = pd.concat([db_handler.get_correlations(gwas, reference_value, division_value, target_type[0]),
-                                                        db_handler.get_correlations(gwas, reference_value, division_value, target_type[1])], ignore_index=True)
-    else: filtered_data = db_handler.get_correlations(gwas, reference_value, division_value, target_type)
-
-    filtered_data = filtered_data.dropna(subset=['P', 'CI_5', 'CI_95'])
+    filtered_data = db_handler.get_correlations(
+        gwas,
+        reference_value,
+        division_value,
+        target_class
+    )
+    filtered_data = filtered_data.rename(columns={'target':'code'})
+    filtered_data = filtered_data.dropna(subset=['P'])
     filtered_data = filtered_data.sort_values(by=['class', 'logpxdir'], ascending=[True, True])
 
     # Plotly figure based on filtered data
@@ -103,9 +162,9 @@ def update_graph(disease_value, reference_value, division_value, tab):
         #else 'Variable vs. logpxdir' if tab == 'quest' 
         #else 'Diseases vs. logpxdir'
     )
-    color = 'class'
+    color = 'domain'
 
-    unique_categories = filtered_data['class'].unique()
+    unique_categories = filtered_data['domain'].unique()
     color_map = {category: colorblind_palette_hex[i % len(colorblind_palette_hex)] for i, category in enumerate(unique_categories)}
  
     filtered_data = filtered_data.rename(columns={'target':'code'})
@@ -114,19 +173,20 @@ def update_graph(disease_value, reference_value, division_value, tab):
                 color= color,
                 color_discrete_map=color_map,
                 template="plotly_white",
+                custom_data=['Code'],
                 hover_data={
-                    'code': True, #Show target code
+                    'Code': True, # Show internal code in hover
                     'description': True,  # Show the description
-                    'class': True,  # Hide class if it's not needed on hover
-                    'odds_ratio': ':.2f',  # Odds Ratio, formatted to 2 decimal places
-                    'logpxdir': False,  # Hide logpxdir if not necessary
-                    'P': ':.2e',
-                    'R2': ':.2f' 
-                } 
+                    'class': True,
+                    'beta': ':.4f',
+                    'odds_ratio': ':.2f',
+                    'logpxdir': False,
+                    'P': ':.2e'
+                }
             )
     
     # Get the number of rows
-    element_count = filtered_data['class'].nunique()
+    element_count = filtered_data['domain'].nunique()
 
     if element_count:
 
@@ -217,11 +277,7 @@ def update_graph(disease_value, reference_value, division_value, tab):
                 yshift=10
             )
         
-    xname = (
-        'Metabolites' if tab == 'met'
-        else 'Variables' if tab == 'quest'
-        else 'Diseases'
-    )
+    xname = target_class.replace('_', ' ')
 
     # Update layout
     fig.update_layout(
@@ -261,26 +317,45 @@ def update_table(disease_value, reference_value, division_value, tab):
     """
     Callback function to update the content of the interactive DataTable and store filtered data.
     """
-    target_type = get_target_type(tab)
-    if reference_value == "low + intermediate": 
-        reference_value = "rest"
 
-    # Example: Fetching filtered data
+    target_class = tab
+
+    if reference_value == "low + intermediate": reference_value = "rest"
+
     gwas = db_handler.get_gwas_code_from_name(disease_value)
-    
-    if isinstance(target_type, tuple): filtered_data = pd.concat([db_handler.get_correlations(gwas, reference_value, division_value, target_type[0]),
-                                                        db_handler.get_correlations(gwas, reference_value, division_value, target_type[1])], ignore_index=True)
-    else: filtered_data = db_handler.get_correlations(gwas, reference_value, division_value, target_type)
 
-    filtered_data = filtered_data.dropna(subset=['P', 'CI_5', 'CI_95'])
+    filtered_data = db_handler.get_correlations(
+        gwas,
+        reference_value,
+        division_value,
+        target_class
+    )
+    filtered_data = filtered_data.rename(columns={'target':'code'})
+
+    filtered_data = filtered_data.dropna(subset=['P'])
     # Round numeric columns to 6 decimal places
     numeric_columns = filtered_data.select_dtypes(include=[np.number]).columns
     filtered_data[numeric_columns] = filtered_data[numeric_columns].round(6)
 
     # Ensure all data types are JSON serializable
     filtered_data = filtered_data.replace({np.nan: None})  # Replace NaN values with None for JSON compatibility
+    # assign consistent column names used by the app
     filtered_data.columns = col_headers
-    filtered_data = filtered_data[['GWAS', "Code", 'Reference', 'Division', 'OR', 'CI_5', 'CI_95', 'P', 'R2', 'Description', 'Class']] # TODO: Need a more elegant solution
+    # select columns we want to show
+    filtered_data = filtered_data[col_headers_tokeep]  # TODO: Need a more elegant solution
+
+    # Sort by numeric P (if present) while values are still numeric, then format numeric columns for display
+    if 'P' in filtered_data.columns:
+        filtered_data = filtered_data.sort_values('P')
+
+    # Format numeric display
+    for c in ['Beta', 'OR', 'CI_5', 'CI_95']:
+        if c in filtered_data.columns:
+            filtered_data[c] = filtered_data[c].apply(lambda x: f"{x:.4f}" if pd.notnull(x) else None)
+
+    # Format P-value into scientific notation with 2 decimal places for display
+    if 'P' in filtered_data.columns:
+        filtered_data['P'] = filtered_data['P'].apply(lambda x: f"{x:.2e}" if pd.notnull(x) else None)
 
     # Convert DataFrame to list of dictionaries for DataTable
     data_store = filtered_data.to_dict('records')
@@ -339,9 +414,9 @@ def filter_values(unfiltered_data, disease_value, quartile_value, reference_valu
 # Callback to change metadata info
 @app.callback(
     Output('graph-footer', 'children'),
-    [Input('disease-dropdown', 'value')]
+    [Input('disease-dropdown', 'value'), Input('url', 'pathname')]
 )
-def update_graph_footer(target_gwas):
+def update_graph_footer(target_gwas, pathname):
     """
     Callback function to update the graph footer depending on the selected condition.
 
@@ -350,7 +425,8 @@ def update_graph_footer(target_gwas):
     """  
 
     # Load the result into a Pandas DataFrame
-    df = db_handler.get_gwas_metadata(target_gwas)
+    df = db_handler.get_all_gwas_metadata()
+    df = df[df['label'] == target_gwas]
 
     # Check if we got any result
     if not df.empty:
@@ -358,9 +434,8 @@ def update_graph_footer(target_gwas):
         row = df.iloc[0] 
         
         # Retrieve date information from metadata
-        date_info = row['date']
-        link_p = row['link_paper']
-        link_s = row['link_sumstats']
+        link_p = row['source']
+        link_s = row['sumstats_source']
         population = row['population']
         n = row['n']
 
@@ -390,7 +465,19 @@ def update_graph_footer(target_gwas):
 )
 def update_clicked_data(clickData):
     if clickData:
-        return {'name': clickData['points'][0].get('x')}
+        pt = clickData['points'][0]
+        # prefer code from customdata (set on the figure); fall back to y
+        code = None
+        cd = pt.get('customdata')
+        if cd is not None:
+            # customdata may be scalar or list-like
+            try:
+                code = cd[0]
+            except Exception:
+                code = cd
+        else:
+            code = pt.get('y')
+        return {'name': pt.get('x'), 'code': code}
     return no_update
 
 # Callback to update statistics title
@@ -427,39 +514,23 @@ def update_basic_statistics(clicked_data, tab):
     if not clicked_data or 'name' not in clicked_data:
         return default_message()
 
-    target_desc = clicked_data['name']
+    target_desc = clicked_data['code']
 
     # Execute queries and load results into DataFrames
-    all_individuals = db_handler.get_indiv_stats()
-    target_individuals = db_handler.get_indiv_stats_for_target(target_desc)
+    prev_target = db_handler.get_disease_prevalence_by_target(target_desc)
 
     # Ensure data is not empty
-    if all_individuals.empty or target_individuals.empty:
+    if prev_target.empty:
         return default_message()
 
-    # Extract relevant data
-    all_row = all_individuals.iloc[0]
-    target_row = target_individuals.iloc[0]
-
-    total_individuals = all_row['total_individuals']
-    total_males = all_row['total_males']
-    total_females = all_row['total_females']
-
-    individuals_with_target = target_row['individuals_with_target']
-    males_with_target = target_row['males_with_target']
-    females_with_target = target_row['females_with_target']
-
-    # Calculate percentages safely
-    general_percentage = (individuals_with_target / total_individuals) * 100 if total_individuals > 0 else 0
-    males_percentage = (males_with_target / total_males) * 100 if total_males > 0 else 0
-    females_percentage = (females_with_target / total_females) * 100 if total_females > 0 else 0
+    total_individuals = prev_target[prev_target['sex'] == 'both']['prevalence'].values[0]
+    total_males = prev_target[prev_target['sex'] == 'male']['prevalence'].values[0]
+    total_females = prev_target[prev_target['sex'] == 'female']['prevalence'].values[0]
 
     # Create a DataFrame for the table
     table_data = pd.DataFrame({
         'Category': ['All', 'Males', 'Females'],
-        'Total n': [total_individuals, total_males, total_females],
-        'With the phenotype': [individuals_with_target, males_with_target, females_with_target],
-        'Percentage': [f"{general_percentage:.2f}%", f"{males_percentage:.2f}%", f"{females_percentage:.2f}%"]
+        'Prevalence': [f"{total_individuals:.4f}", f"{total_males:.4f}", f"{total_females:.4f}"]
     })
 
     # Generate the table
@@ -483,89 +554,87 @@ def update_basic_statistics(clicked_data, tab):
         button  # Add the button here
     ], className="info-box")
 
-# Callback to update the prevalences graph
 @app.callback(
     Output('prevalences-graph', 'figure'),
-    [Input('disease-dropdown', 'value'),
-    Input('clicked-data-store', 'data'),
-    State('tabs', 'value')]
+    [
+        Input('clicked-data-store', 'data'),
+        Input('disease-dropdown', 'value')
+    ]
 )
-def update_prevalences_graph(disease_value, target, tab):
+def update_prevalences_graph(clicked, disease_value):
 
-    target_type = get_target_type(tab)
+    if not clicked or not clicked.get('code'):
+        return px.scatter(title='Click a point on the main plot to show prevalence by percentile')
 
-    try:
-        target_id = db_handler.get_target_code(target['name'], target_type)
-        gwas = db_handler.get_gwas_code_from_name(disease_value)
-        df = db_handler.get_prevalences(gwas, target_id)
+    prs_code = db_handler.get_gwas_code_from_name(disease_value)
+    df = db_handler.get_prevalences(prs_code, clicked['code'])
+    ttype = db_handler.get_target_type(clicked['code'])
 
-        # Check if data is available
-        if df.empty:
-            return px.scatter(title="Select a Phecode or ICD code from the graph")
+    if df.empty:
+        return px.scatter(title='No prevalence data available for selected target')
 
-        # Melt the DataFrame to have a long format suitable for Plotly
-        df = df.rename(columns={'prevalence_all':'All', 'prevalence_male':'Male', 'prevalence_female':'Female'})
-        df_melted = df.melt(id_vars='percentile', value_vars=['All', 'Female', 'Male'],
-                            var_name='Sex', value_name='Prevalence')
+    # Map PRS column → display label
+    df['Sex'] = df['prs_column'].map({
+        'PRS_agg': 'All',
+        'PRS_male': 'Male',
+        'PRS_female': 'Female'
+    })
 
-        # Create the Plotly figure
-        fig = px.scatter(df_melted, x='percentile', y='Prevalence', color='Sex',
-                        title=f"{target_id} - {target['name']} - Prevalence by Percentile".title(),
-                        labels={'percentile': 'Percentile', 'Prevalence': 'Prevalence'},
-                        color_discrete_map={'All': colors[0], 'Female': colors[1], 'Male': colors[2]},
-                        opacity=0.4,
-                        )
-        
-        # Update the scatter traces to hide Female and Male points by default
-        fig.for_each_trace(lambda trace: trace.update(visible='legendonly'))
-        
-        # Define a function to compute LOESS and add to the plot
-        def add_loess_line(df, percentile_col, prevalence_col, color, name, visible='legendonly', frac=0.3):
-            loess = sm.nonparametric.lowess(df[prevalence_col], df[percentile_col], frac=frac)
-            loess_x = loess[:, 0]
-            loess_y = loess[:, 1]
-            
-            fig.add_trace(go.Scatter(x=loess_x, y=loess_y, mode='lines',
-                                    name=name,
-                                    line=dict(color=color, width=3),
-                                    showlegend=True,
-                                    visible=visible))
+    df = df.dropna(subset=['Sex'])
 
-        # Apply LOESS for each prevalence category
-        add_loess_line(df_melted[df_melted['Sex'] == 'All'], 'percentile', 'Prevalence',
-                    color=colors[0], name='LOESS All', visible=True, frac=0.3)
-        add_loess_line(df_melted[df_melted['Sex'] == 'Female'], 'percentile', 'Prevalence',
-                    color=colors[1], name='LOESS Female', visible='legendonly', frac=0.3)
-        add_loess_line(df_melted[df_melted['Sex'] == 'Male'], 'percentile', 'Prevalence',
-                    color=colors[2], name='LOESS Male', visible='legendonly', frac=0.3)
+    if ttype == 'continuous':
+        ylabel = 'Mean value'
+    else:
+        ylabel = 'Prevalence'
 
-        # Customize the layout to only show points in the legend
-        fig.update_traces(showlegend=True, selector=dict(mode='lines'))
-        fig.update_traces(showlegend=True, selector=dict(mode='markers'))
+    n_groups = df['percentile'].max() +1
+    if n_groups == 100:
+        xlabel = "Percentile"
+    elif n_groups == 10:
+        xlabel = "Decile"
+    elif n_groups == 4:
+        xlabel = "Quartile"
+    else:
+        xlabel = f"{n_groups} risk score groups"
 
-        fig.update_layout(
-            xaxis_title=f'Percentile (risk score for {disease_value})',
-            yaxis_title='Prevalence (%)',
-            template="plotly_white",
-        )
+    fig = px.scatter(
+        df,
+        x='percentile',
+        y='prevalence',
+        color='Sex',
+        opacity=0.4,
+        template='plotly_white'
+    )
 
-    except UnboundLocalError:
-        return px.scatter(title="Select a Phecode or ICD code from the graph")
-    except TypeError:
-        return px.scatter(title="Select a Phecode or ICD code from the graph")
+    # Hide all scatter points by default (show only LOESS lines)
+    fig.for_each_trace(
+        lambda t: t.update(visible='legendonly')
+    )
 
-    
+    # Apply LOESS
+    add_loess(fig, df[df['Sex'] == 'All'], 'percentile', 'prevalence', 'All', True)
+    add_loess(fig, df[df['Sex'] == 'Female'], 'percentile', 'prevalence', 'Female', 'legendonly')
+    add_loess(fig, df[df['Sex'] == 'Male'], 'percentile', 'prevalence', 'Male', 'legendonly')
+
+    fig.update_layout(
+        title={'text': f"{(clicked.get('name') if clicked else '')} — {ylabel} by {xlabel}", 'x': 0.5},
+        xaxis_title=f'{xlabel} ({disease_value})',
+        yaxis_title=ylabel,
+        height=PREVALENCE_HEIGHT,
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+
     return fig
 
 def get_target_type(tab):
     if (tab == 'met'):
-        return 'Metabolite'
+        return 'Metabolites'
     elif (tab == 'icd'):
         return 'ICD code'
     elif (tab == 'phe'):
         return 'Phecode'
     elif (tab == 'quest'):
-        return ('binary', 'continuous')
+        return ('Other Variables')
 
 # Callback to update targets graph in cohort page
 @app.callback(
@@ -574,8 +643,8 @@ def get_target_type(tab):
     [Input('gender-filter', 'value')]
 )
 def update_graphs(gender_filter):
-    phecode_fig = get_target_plot('Phecode', gender_filter)
-    icd_code_fig = get_target_plot('ICD code', gender_filter)
+    phecode_fig = get_target_plot('Phecodes', gender_filter)
+    icd_code_fig = get_target_plot('ICD_codes', gender_filter)
     return phecode_fig, icd_code_fig
 
 # Callback to update the target specific age distribution graph
@@ -614,52 +683,33 @@ def get_target_specific_dist_graph(selected_target, output_type):
             )
         )
     
-    targets_df = db_handler.get_target_stats()
-
-    # Filter data based on the selected target
-    filtered_df = targets_df[targets_df['target_id'] == selected_target]
+    targets_df = db_handler.get_cohort_distribution(selected_target, output_type)
 
     if output_type == 'age':
         col_name = 'age_group'
-        axis_name = 'Age'
+        axis_name = 'Age at first diagnosis'
         df_name = 'age'
     elif output_type == 'bmi':
         col_name = 'bmi_group'
         axis_name = 'BMI'
         df_name = 'bmi'
 
-    # Group ages into 5-year intervals
-    filtered_df = filtered_df.copy()
-    filtered_df.loc[:, col_name] = pd.cut(filtered_df[df_name], bins=range(0, 101, 5), right=False)
-
-    # Summarize the counts by age group and gender
-    summary_df = filtered_df.groupby([col_name, 'gender'],  observed=True).agg({'count': 'sum'}).reset_index()
-
-    # Compute the total count per age group (sum of both genders)
-    total_counts = summary_df.groupby(col_name,  observed=True)['count'].sum().reset_index()
-    total_counts['gender'] = 'Combined'
-    summary_df = pd.concat([summary_df, total_counts])
-
-    genders = summary_df['gender'].unique()
-    age_groups = summary_df[col_name].unique()
-    all_combinations = pd.MultiIndex.from_product([age_groups, genders], names=[col_name, 'gender']).to_frame(index=False)
-    df_complete = pd.merge(all_combinations, summary_df, on=[col_name, 'gender'], how='left')
-    df_complete['count'] = df_complete['count'].fillna(0)
-
     # Create the bar graph with three bars: Male, Female, and Total
     fig = go.Figure()
 
-    genders = [['Male', colors[1]], ['Female', colors[2]], ['Combined', colors[0]]]
+    genders = [['MALE', colors[1]], ['FEMALE', colors[2]], ['both', colors[0]]]
+
+    gender_m = {'MALE': 'Male', 'FEMALE': 'Female', 'both': 'Combined'}
     for gender,color in genders:
-        gender_data = df_complete[df_complete['gender'] == gender]
+        gender_data = targets_df[targets_df['sex'] == gender]
         fig.add_trace(go.Bar(
-            x=[str(age) for age in gender_data[col_name]],
+            x=gender_data['category'],
             y=gender_data['count'],
-            name=gender,
+            name=gender_m[gender],
             marker_color=color,
         ))
 
-    title = f'{axis_name} - {filtered_df.iloc[0]["target_id"].capitalize()}'
+    title = f'{axis_name} - {selected_target.capitalize()}'
     font_size = get_dynamic_font_size(title)
 
     # Update layout for better visualization
@@ -708,49 +758,50 @@ def get_target_specific_hs_graph(selected_target):
             )
         )
     
-    targets_df = db_handler.get_target_stats()
-    filtered_df = targets_df[targets_df['target_id'] == selected_target]
-
-    # Define the desired order for self_perceived_hs
-    hs_order = ['Very Bad', 'Bad', 'Fair', 'Good', 'Very good', 'DK/NO']
+    targets_df = db_handler.get_cohort_distribution(selected_target, 'self_perceived_hs')
     
-    # Convert self_perceived_hs to a categorical type with the defined order
-    filtered_df['self_perceived_hs'] = pd.Categorical(filtered_df['self_perceived_hs'], categories=hs_order, ordered=True)
-    hs_dist = filtered_df.groupby(['gender', 'self_perceived_hs'], observed=False).size().unstack(fill_value=0)
-    dist = hs_dist[hs_order]
+    hs_order_f = [cat for cat in hs_order if cat in targets_df['category'].values]
+
+    targets_df = (
+        targets_df.set_index("category")
+        .loc[hs_order_f]
+        .reset_index()
+    )
 
     fig = go.Figure()
 
     # Add bar for males
-    if 'Male' in dist.index:
+    if 'MALE' in targets_df['sex'].unique():
+        male_df = targets_df[targets_df['sex'] == 'MALE']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=dist.loc['Male'],
+            x=male_df['category'],
+            y=male_df['count'],
             name='Males',
             marker_color=colors[1]
         ))
 
     # Add bar for females
-    if 'Female' in dist.index:
+    if 'FEMALE' in targets_df['sex'].unique():
+        female_df = targets_df[targets_df['sex'] == 'FEMALE']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=dist.loc['Female'],
+            x=female_df['category'],
+            y=female_df['count'],
             name='Females',
             marker_color=colors[2]
         ))
-
+    
     # Add bar for combined data
-    if 'Male' in dist.index and 'Female' in dist.index:
-        combined_counts = dist.loc['Male'] + dist.loc['Female']
+    if 'both' in targets_df['sex'].unique():
+        combined_df = targets_df[targets_df['sex'] == 'both']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=combined_counts,
+            x=combined_df['category'],
+            y=combined_df['count'],
             name='Combined',
             marker_color=colors[0],
             opacity=0.5  # Make combined bars slightly transparent
         ))
 
-    title = f'Self-Perc. HS - {filtered_df.iloc[0]["target_id"].capitalize()}'
+    title = f'Self-Perc. HS - {selected_target.capitalize()}'
     font_size = get_dynamic_font_size(title)
 
     # Update layout for better visualization
@@ -804,17 +855,16 @@ def update_target_specific_gender_distribution_graph(selected_target):
             )
         )
     
-    targets_df = db_handler.get_target_stats()
+    targets_df = db_handler.get_cohort_distribution(selected_target, 'gender')
 
     # Filter data based on the selected target
-    filtered_df = targets_df[targets_df['target_id'] == selected_target]
-    total_counts = filtered_df.groupby('gender')['count'].sum().reset_index()
+    total_counts = targets_df['count'].sum()
     try:
-        female_count = total_counts.loc[total_counts['gender'] == 'Female', 'count'].values[0]
+        female_count = targets_df[targets_df['sex'] == 'FEMALE']['count'].values[0]
     except IndexError as e:
         female_count = 0
     try:
-        male_count = total_counts.loc[total_counts['gender'] == 'Male', 'count'].values[0]
+        male_count = targets_df[targets_df['sex'] == 'MALE']['count'].values[0]
     except IndexError as e:
         male_count = 0
 
@@ -832,7 +882,7 @@ def update_target_specific_gender_distribution_graph(selected_target):
         )
     )
 
-    title = f'Gender - {filtered_df.iloc[0]["target_id"].capitalize()}'
+    title = f'Gender - {selected_target.capitalize()}'
     font_size = get_dynamic_font_size(title)
 
     fig.update(layout_showlegend=False)
@@ -940,51 +990,18 @@ def update_disease_dropdown(selected_gwas):
 ##################################################### App Layout ####################################################
 #####################################################################################################################
 
-# Functions to fetch data
-def fetch_data(res_type):
-    
-    stats = db_handler.get_indiv_count()
-    df = db_handler.get_age_and_gender()
-
-    # Define the desired order for self_perceived_hs
-    hs_order = ['Very Bad', 'Bad', 'Fair', 'Good', 'Very good', 'DK/NO']
-    
-    # Convert self_perceived_hs to a categorical type with the defined order
-    df['self_perceived_hs'] = pd.Categorical(df['self_perceived_hs'], categories=hs_order, ordered=True)
-
-
-    # Create age bins and count occurrences
-    age_bins = pd.cut(df['age'], bins=range(0, 101, 5), right=False)
-    bmi_bins = pd.cut(df['bmi'], bins=range(0, 101, 5), right=False)
-
-    age_dist = df.groupby(['gender', age_bins], observed=True).size().unstack(fill_value=0)
-    bmi_dist = df.groupby(['gender', bmi_bins], observed=True).size().unstack(fill_value=0)
-
-    # Convert IntervalIndex to string for plotting
-    age_dist.columns = age_dist.columns.astype(str)
-    bmi_dist.columns = bmi_dist.columns.astype(str)
-
-    hs_dist = df.groupby(['gender', 'self_perceived_hs'],  observed=False).size().unstack(fill_value=0)
-    hs_dist = hs_dist[hs_order]
-    
-    if res_type == 'age': 
-        return age_dist
-    elif res_type == 'bmi':
-        return bmi_dist
-    elif res_type == 'hs':
-        return hs_dist
-    elif res_type == 'gender':
-        return stats
+# Define the desired order for self_perceived_hs
+hs_order = ['Very Bad', 'Bad', 'Fair', 'Good', 'Very good', 'DK/NO']
 
 def get_gender_graph():
     
     # Fetch data
-    stats = fetch_data('gender')
+    stats = db_handler.get_cohort_distribution('all', 'gender')
 
     # Calculate percentages
-    total_individuals = stats[0]
-    male_count = stats[1]
-    female_count = stats[2]
+    total_individuals = stats['count'].sum()
+    male_count = stats[stats['sex'] == 'MALE']['count'].values[0]
+    female_count = stats[stats['sex'] == 'FEMALE']['count'].values[0]
     male_percentage = round((male_count / total_individuals) * 100, 1)
     female_percentage = round((female_count / total_individuals) * 100, 1)
 
@@ -1012,34 +1029,44 @@ def get_gender_graph():
     return fig
 
 def get_distribution_graph(output_type):
-    dist = fetch_data(output_type)
+    dist = db_handler.get_cohort_distribution('all', output_type)
 
     fig = go.Figure()
 
+    if output_type == 'self_perceived_hs':
+        # Reorder the DataFrame based on the predefined order
+        dist = (
+            dist.set_index("category")
+            .loc[hs_order]
+            .reset_index()
+        )
+
     # Add bar for males
-    if 'Male' in dist.index:
+    if 'MALE' in dist['sex'].values:
+        male_df = dist[dist['sex'] == 'MALE']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=dist.loc['Male'],
+            x=male_df['category'],
+            y=male_df['count'],
             name='Males',
             marker_color=colors[1]
         ))
 
     # Add bar for females
-    if 'Female' in dist.index:
+    if 'FEMALE' in dist['sex'].values:
+        female_df = dist[dist['sex'] == 'FEMALE']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=dist.loc['Female'],
+            x=female_df['category'],
+            y=female_df['count'],
             name='Females',
             marker_color=colors[2]
         ))
 
     # Add bar for combined data
-    if 'Male' in dist.index and 'Female' in dist.index:
-        combined_counts = dist.loc['Male'] + dist.loc['Female']
+    if 'both' in dist['sex'].values:
+        both_df = dist[dist['sex'] == 'both']
         fig.add_trace(go.Bar(
-            x=dist.columns,
-            y=combined_counts,
+            x=both_df['category'],
+            y=both_df['count'],
             name='Combined',
             marker_color=colors[0],
             opacity=0.5  # Make combined bars slightly transparent
@@ -1049,7 +1076,7 @@ def get_distribution_graph(output_type):
         title = 'Age'
     elif output_type == 'bmi':
         title = 'BMI'
-    elif output_type == 'hs':
+    elif output_type == 'self_perceived_hs':
         title = 'Self-Perceived HS' 
 
     fig.update_layout(
@@ -1068,24 +1095,8 @@ def get_distribution_graph(output_type):
 
     return fig
 
-def get_target_plot(target_type, gender_filter='All'):
-    df = db_handler.get_target_stats().groupby(['target_id', 'target_description', 'target_type', 'gender'])['count'].sum().reset_index()
-
-    # Filter based on target_type (either Phecode or ICD code)
-    filtered_df = df[df['target_type'] == target_type]
-    
-     # Apply gender filter if specified
-    if gender_filter and gender_filter != "All":
-        filtered_df = filtered_df[filtered_df['gender'] == gender_filter]
-    
-    # Group by target_id and target_description, summing the counts
-    df_grouped = filtered_df.groupby(['target_id', 'target_description'])['count'].sum().reset_index()
-    
-    # Sort by count in descending order and select the top 25 targets
-    df_grouped = df_grouped.sort_values(by='count', ascending=False).head(25)
-    
-    # Ensure the targets with the most individuals appear at the top
-    df_grouped = df_grouped.sort_values(by='count', ascending=True)
+def get_target_plot(target_type, gender_filter='both'):
+    df = db_handler.get_disease_prevalence(target_type, gender_filter)
 
     # Define colors for gender filter
     color_map = {
@@ -1097,41 +1108,45 @@ def get_target_plot(target_type, gender_filter='All'):
     # Determine color based on gender_filter
     colors_local = color_map.get(gender_filter, color_map['All'])
 
+    df = df.sort_values(by='prevalence', ascending=True)
+
     # Create the bar plot
     fig = px.bar(
-        df_grouped,
-        x='count',
-        y='target_id',
+        df,
+        x='prevalence',
+        y='target_code',
         orientation='h',
-        title=f"Top 25 {target_type}s by Number of Individuals ({gender_filter})",
-        labels={'count': 'Number of Individuals', 'target_description': 'Target Description', 'target_id':'Code'},
+        title=f"Top 25 {target_type}s by Prevalence ({gender_filter})",
+        labels={'prevalence': 'Prevalence', 'target_code':'Code', 'target_description':'Description'},
         color_discrete_sequence=colors_local,  # Apply color sequence
         hover_data={
-            'target_id': True,  # Display target ID
-            'target_description': True,  # Display target description, cap if needed
-            'count': ':.0f'  # Format count with no decimals
+            'target_code': True,  # Display target ID
+            'target_description': True,  # Display target description
+            'prevalence': ':.2f'  # Format prevalence with 2 decimal places
         }
     )
 
     # Set the background to transparent
     fig.update_layout(
         plot_bgcolor='rgba(0, 0, 0, 0)',  # Plot background
-        paper_bgcolor='rgba(0, 0, 0, 0)'  # Overall figure background
+        paper_bgcolor='rgba(0, 0, 0, 0)',  # Overall figure background
+        height=600  # Set height to 1.5x taller
     )   
     
     return fig
 
 def format_targets_for_dropdown():
     targets = db_handler.get_target_stats()
+    targets = targets[targets['target_class'].isin(['Phecodes', 'ICD_codes'])]  # Filter for relevant target classes
 
     # Remove duplicates based on 'target_id', 'target_description', and 'target_type'
-    unique_targets = targets[['target_id', 'target_description', 'target_type']].drop_duplicates()
+    unique_targets = targets[['target_id', 'target_description', 'target_class']].drop_duplicates()
     unique_targets = unique_targets.sort_values(by='target_id')
 
     # Create a list of dictionaries for the dropdown options
     dropdown_options = [
         {
-            'label': f"{row['target_id']} - {row['target_description'].capitalize()[:25]}{'...' if len(row['target_description']) > 30 else ''} ({row['target_type']})",
+            'label': f"{row['target_id']} - {row['target_description'].capitalize()[:25]}{'...' if len(row['target_description']) > 30 else ''} ({row['target_class']})",
             'value': row['target_id']
         }
         for _, row in unique_targets.iterrows()
@@ -1196,7 +1211,7 @@ prs_page_layout = dbc.Container([
                         options=disease_options,
                         placeholder='Select phenotype',
                         clearable=True,
-                        value='Waist-hip Ratio',
+                        value=(gwas_names[0] if gwas_names else None),
                         className="dropdown-box"
                     ),
                     html.P('Reference Group (decile/quartile) for Comparison:', className="dropdown-title"),
@@ -1214,7 +1229,7 @@ prs_page_layout = dbc.Container([
                         options=division_options,
                         placeholder='Select division',
                         clearable=False,
-                        value="decile",
+                        value="10",
                         className="dropdown-box"
                     ),
                 ]),
@@ -1227,16 +1242,21 @@ prs_page_layout = dbc.Container([
                 dcc.Location(id='location', refresh=False),
             ], className="dropdown-box"),
         ], xs=12, sm=12, md=4, lg=4, xl=4, className="left-container"),
-        dbc.Col([
-            dcc.Tabs(id="tabs", value='icd', children=[
-            dcc.Tab(label='ICD codes', value='icd'),
-            dcc.Tab(label='Phecodes', value='phe'),
-            dcc.Tab(label='Metabolites', value='met'),
-            dcc.Tab(label='Other Variables', value='quest'),
-            ]),
-            dcc.Graph(id='correlations-graph'),
-            html.P(id='graph-footer', className="graph-footer"),
-        ], xs=12, sm=12, md=8, lg=8, xl=8, className="graph-container")
+            dbc.Col([
+                dcc.Tabs(
+                    id="tabs",
+                    value=default_tab,
+                    children=tabs_children
+                ),
+                dcc.Graph(
+                    id='correlations-graph',
+                    style={'height': f'{PHEWAS_HEIGHT}px'},
+                    config={'displayModeBar': False}
+                ),
+                html.P(id='graph-footer', className="graph-footer"),
+            ],
+            xs=12, sm=12, md=8, lg=8, xl=8,
+            className="graph-container")
     ], justify='center', className="dashboard-div"),
     html.Br(),
     # Store component to keep track of clicked data point
@@ -1245,7 +1265,12 @@ prs_page_layout = dbc.Container([
     dbc.Row([
         # First row with basic statistics and one graph
         dbc.Col([
-            dcc.Graph(id='prevalences-graph', className="prevalences-graph")
+            dcc.Graph(
+                id='prevalences-graph',
+                className="prevalences-graph",
+                style={'height': f'{PREVALENCE_HEIGHT}px'},
+                config={'displayModeBar': False}
+            )
         ], width=12, md=7, className="full-height custom-col"),  # 70% width for the graph
         dbc.Col([
             html.Div([
@@ -1283,8 +1308,21 @@ prs_page_layout = dbc.Container([
                 style_cell={
                     'overflow': 'hidden',
                     'textOverflow': 'ellipsis',
-                    'maxWidth': 0
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'maxWidth': '600px'
                 },
+                style_cell_conditional=[
+                    {'if': {'column_id': 'GWAS_code'}, 'width': '80px', 'minWidth': '60px', 'maxWidth': '120px'},
+                    {'if': {'column_id': 'Code'}, 'width': '80px', 'minWidth': '60px', 'maxWidth': '120px'},
+                    {'if': {'column_id': 'Description'}, 'textAlign': 'left', 'width': '380px', 'minWidth': '200px', 'maxWidth': '600px'},
+                    {'if': {'column_id': 'Domain'}, 'textAlign': 'left', 'width': '260px', 'minWidth': '140px', 'maxWidth': '400px'},
+                    {'if': {'column_id': 'Beta'}, 'width': '90px', 'minWidth': '70px', 'maxWidth': '120px', 'textAlign': 'right'},
+                    {'if': {'column_id': 'OR'}, 'width': '90px', 'minWidth': '70px', 'maxWidth': '120px', 'textAlign': 'right'},
+                    {'if': {'column_id': 'CI_5'}, 'width': '90px', 'minWidth': '70px', 'maxWidth': '120px', 'textAlign': 'right'},
+                    {'if': {'column_id': 'CI_95'}, 'width': '90px', 'minWidth': '70px', 'maxWidth': '120px', 'textAlign': 'right'},
+                    {'if': {'column_id': 'P'}, 'width': '110px', 'minWidth': '80px', 'maxWidth': '140px', 'textAlign': 'right'},
+                ],
                 
                 style_header={
                 'backgroundColor': 'rgba(86, 102, 122, .10)',
@@ -1354,7 +1392,7 @@ cohort_page_layout = dbc.Container([
             dbc.Col(
                 html.Div([
                     dcc.Graph(
-                        figure=get_distribution_graph('hs'),
+                        figure=get_distribution_graph('self_perceived_hs'),
                         id='hs-distribution-chart',
                         className="cohort-graph",
                     )
@@ -1375,11 +1413,11 @@ cohort_page_layout = dbc.Container([
                     dcc.Dropdown(
                         id='gender-filter',
                         options=[
-                            {'label': 'All', 'value': 'All'},
+                            {'label': 'All', 'value': 'both'},
                             {'label': 'Female', 'value': 'Female'},
                             {'label': 'Male', 'value': 'Male'},
                         ],
-                        value='All',
+                        value='both',
                         placeholder="Filter by Gender",
                         className='dropdown-box cohort-dropdown'
                     ),
@@ -1466,8 +1504,8 @@ cohort_page_layout = dbc.Container([
 # List of columns to display with custom names
 selected_columns = [
     {"name": "GWAS", "id": "name"},
-    {"name": "Link Paper", "id": "link_paper"},
-    {"name": "Link Summary Statistics", "id": "link_sumstats"},
+    {"name": "Link Paper", "id": "source"},
+    {"name": "Link Summary Statistics", "id": "sumstats_source"},
     {"name": "N", "id": "n"},
 ]
 
@@ -1494,43 +1532,6 @@ gwas_page_layout = dbc.Container([
     ]),
 ], fluid=True)
 
-# About page layout
-# about_page_layout = dbc.Container([])
-"""
-### TODO Uncomment at release time
-# General app layout
-app.layout = dbc.Container([
-    dcc.Location(id='url', refresh=False),
-    navbar,
-    # Modal (Popup) for Terms and Conditions
-    html.Div(
-        id='terms-modal',
-        className='modal',
-        children=[
-            html.Div(
-                className='modal-content',
-                children=[
-                    html.H4('Terms and Conditions'),
-                    html.P([
-                        "Please accept the ",
-                        html.A(
-                            "terms and conditions",
-                            href="/assets/terms_conditions.pdf",  # Link to the terms and conditions PDF
-                            target="_blank",  # Opens link in a new tab
-                        ),
-                        " to continue."
-                    ]),
-                    html.Button('Accept', id='accept-button', className='button', n_clicks=0),
-                ]
-            )
-        ]
-    ),
-    html.Div(id='page-content'),
-    dcc.Store(id='shared-target-data', data=[None, None], storage_type='session'),
-    dcc.Store(id='selected-gwas', data=None)
-], fluid=True)
-"""
-
 # General app layout
 app.layout = dbc.Container([
     dcc.Location(id='url', refresh=False),
@@ -1543,12 +1544,12 @@ app.layout = dbc.Container([
             html.Div(
                 className='modal-content',
                 children=[
-                    html.H4('PolyGenie Beta Version'),
-                    html.P("This is a beta release of the PolyGenie platform, developed for research demonstration purposes."),
-                    html.P("Features, results, and the interface are still under development and subject to change."),
-                    html.P("The tool is based on precomputed results from the GCAT cohort and does not expose individual-level genotype data."),
-                    html.P("For questions, feedback, or collaboration inquiries, please contact us at: gcatbiobank@igtp.cat."),
-                    html.P("By continuing, you acknowledge that this is a non-final academic tool provided for demonstration purposes."),
+                    html.H4('Usage and Contact Information'),
+                    html.P([
+                        "For questions, feedback, request a new PRS, or collaboration inquiries, please contact us at: ",
+                        html.A("gcatbiobank@igtp.cat", href="mailto:gcatbiobank@igtp.cat")
+                    ]),
+                    html.P("If the tool contributes to a publication, please cite PolyGenie and the original GWAS used to compute the PRS."),
                     html.Button('Accept', id='accept-button', className='button', n_clicks=0),
                 ]
             )

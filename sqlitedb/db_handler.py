@@ -1,985 +1,546 @@
-import logging
-import os
 import sqlite3
 import pandas as pd
+from pathlib import Path
+import logging
+import os
 
-
-# Logger for db_loader messages
-db_logger = logging.getLogger('db_handler_logger')
-db_logger.setLevel(logging.ERROR)
-db_handler = logging.FileHandler('logs/db_handler.log')
-db_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-db_logger.addHandler(db_handler)
+logger = logging.getLogger(__name__)
 
 class DBHandler:
-    '''
-    The `DBHandler` class provides methods to interact with an SQLite database, 
-    handling the querying and manipulation of GWAS (Genome-Wide Association Studies) data, individuals, 
-    targets, and phenotypes. It also supports inserting new data and performing basic statistics on the records.
+    def __init__(self, db_file: str):
+        self.db = db_file
 
-    Attributes
-    ----------
-    db_path : str
-        The file path to the SQLite database.
-    
-    Methods
-    -------
-    create_db(schema_file)
-        Creates the database schema from a provided SQL file.
-    connect()
-        Establishes a connection to the SQLite database.
-    get_gwas_names()
-        Retrieves the list of all GWAS names from the database.
-    get_correlations(gwas, quartile, reference, division, target_type)
-        Fetches correlation data for a specific GWAS, quartile, reference, division, and target type.
-    get_gwas_metadata(gwas)
-        Retrieves metadata associated with a specific GWAS entry.
-    get_indiv_ids()
-        Fetches individual IDs and their corresponding entity IDs.
-    get_indiv_stats()
-        Returns a count of total individuals, male individuals, and female individuals.
-    get_indiv_stats_for_target(target)
-        Fetches the number of individuals with a specific target phenotype.
-    get_target_code(desc, t_type)
-        Retrieves the code for a target based on its description and type.
-    get_phecodes()
-        Returns all Phecodes from the database.
-    get_icd_codes()
-        Returns all ICD codes from the database.
-    get_prevalences(gwas, target)
-        Retrieves prevalence data for a given GWAS and target.
-    get_indiv_count()
-        Returns the total count of individuals, with counts for males and females.
-    get_age_and_gender()
-        Retrieves age, gender, BMI, and self-perceived health status for all individuals.
-    get_target_stats()
-        Retrieves statistical data about targets and their associated phenotypes.
-    get_risk_scores(self, target, gwas, percentile)
-        Retrieves the risk scores for a set target, gwas and percentile.
-    set_targets(df)
-        Inserts or updates target information in the database.
-    set_individuals(df)
-        Inserts or updates individual information in the database.
-    set_phenotypes(df)
-        Inserts or updates phenotypes for individuals in the database.
-    set_gwas(df)
-        Inserts or updates GWAS data from a pandas DataFrame.
-    set_correlations(self, df)
-        Inserts or updates correlations data from a pandas DataFrame.
-    set_prs(self, df)
-        Inserts or updates risk_scores data from a pandas DataFrame.
-    db_writer_prevalences(self, result_queue)
-        Inserts or updates prevalences data with the data from a queue. 
-        Meant to use for inserting data that is being computed in parallel with several threads.
-    _bulk_insert(self, batch, query, batch_size=1000)
-        Inserts data to the DB from a given batch of information and using the specified query. 
-        Meant for internal use only, it should not be called from methods outside this class.
-    '''
-
-    def __init__(self, db_path):
+    def _query(self, sql: str, params=()):
+        # Log the query at debug level (compacted)
+        try:
+            logger.debug("SQL Query: %s -- params=%s", " ".join(sql.split()), params)
+        except Exception:
+            # Protect against logging issues
+            pass
+        try:
+            con = sqlite3.connect(self.db)
+            df = pd.read_sql(sql, con, params=params)
+            con.close()
+            logger.debug("Query returned %d rows", len(df))
+            return df
+        except Exception as e:
+            logger.exception("Query failed: %s", e)
+            raise
+ 
+    def get_target_classes(self):
         """
-        Initialises the `DBHandler` instance.
-
-        Parameters
-        ----------
-        db_path : str
-            The file path to the SQLite database.
-        """
-        self.db_path = db_path
-
-    def create_db(self, schema_file, db_location):
-        """
-        Creates the database schema from the provided SQL file.
-
-        Parameters
-        ----------
-        schema_file : str
-            Path to the SQL file that contains the schema definition.
-        """
-        conn = self.connect(db_location)
-        cursor = conn.cursor()
-
-        with open(schema_file, 'r') as file:
-            cursor.executescript(file.read())
-        
-        conn.close()
-
-    def connect(self, db_path=0):
-        """
-        Establishes a connection to the SQLite database.
-
-        Returns
-        -------
-        sqlite3.Connection
-            A connection object to interact with the SQLite database.
-        """
-        if db_path == 0: return sqlite3.connect(self.db_path)
-        else: return sqlite3.connect(db_path)
-    
-    #################################################################################################################################
-    ############################################################  READS  ############################################################
-    #################################################################################################################################
-
-    def get_cohorts(self):
-        """
-        Fetches cohorts data.
+        Return all distinct non-empty target_class values from the target table.
 
         Returns
         -------
         pandas.DataFrame
-            A DataFrame containing the cohorts data.
+            Single-column DataFrame with column 'target_class'.
+            Empty DataFrame if table does not exist or no valid classes found.
         """
-        conn = self.connect()
-        cursor = conn.cursor()
+        try:
+            # Check table existence first
+            exists = self._query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='target'"
+            )
+            if exists.empty:
+                logger.debug("Table does not exist: target")
+                return pd.DataFrame(columns=['target_class'])
 
-        query = 'SELECT * FROM cohorts'
+            df = self._query("""
+                SELECT DISTINCT target_class
+                FROM target
+                WHERE target_class IS NOT NULL
+                AND TRIM(target_class) != ''
+                ORDER BY target_class
+            """)
 
-        rows = cursor.execute(query).fetchall()
-        gwas_list = [gwas[0] for gwas in rows]
+            if df.empty:
+                logger.debug("No target_class values found in target table")
 
-        conn.close()
+            return df
 
-        return gwas_list
+        except Exception as e:
+            logger.debug("Could not fetch target classes: %s", e)
+            return pd.DataFrame(columns=['target_class'])
+
 
     def get_gwas_names(self):
+        """Return a list of GWAS labels for the dropdown."""
+        df = self._query("SELECT COALESCE(label, name) AS label FROM gwas_metadata ORDER BY label")
+        return df['label'].tolist()
+
+    def get_gwas_code_from_name(self, display_name):
+        """Map a human label back to the internal GWAS code (name)."""
+        df = self._query("SELECT name FROM gwas_metadata WHERE label = ? OR name = ? LIMIT 1", (display_name, display_name))
+        if df.empty:
+            return display_name
+        return df.iloc[0]['name']
+
+    def get_prs_n_groups(self, prs_name):
+        """Return sorted unique n_groups available for a given PRS name."""
+        logger.debug("get_prs_n_groups called with prs_name=%s", prs_name)
+        try:
+            df = self._query("SELECT DISTINCT n_groups FROM phewas_result WHERE prs_name = ? AND n_groups IS NOT NULL ORDER BY n_groups", (prs_name,))
+            if df.empty:
+                logger.debug("No n_groups found for PRS: %s", prs_name)
+                return []
+            groups = [int(x) for x in df['n_groups'].tolist()]
+            logger.debug("Found n_groups for %s: %s", prs_name, groups)
+            return groups
+        except Exception:
+            logger.exception("Could not get n_groups for PRS: %s", prs_name)
+            return []
+
+    def get_prs_include_intermediates(self, prs_name):
+        """Return True if any run for the PRS has include_intermediates set.
+
+        This allows the UI to offer the "low + intermediate" reference option when applicable.
         """
-        Retrieves a list of all GWAS names from the database.
+        logger.debug("get_prs_include_intermediates called with prs_name=%s", prs_name)
+        try:
+            df = self._query("SELECT DISTINCT include_intermediates FROM phewas_result WHERE prs_name = ? AND include_intermediates IS NOT NULL", (prs_name,))
+            if df.empty:
+                logger.debug("No include_intermediates rows for PRS: %s", prs_name)
+                return False
+            # Values may be stored as 0/1 or '0'/'1' or boolean
+            vals = set()
+            for v in df['include_intermediates'].tolist():
+                try:
+                    vals.add(int(v))
+                except Exception:
+                    if isinstance(v, str) and v.lower() in ('true','t','yes'):
+                        vals.add(1)
+                    elif isinstance(v, str) and v.lower() in ('false','f','no'):
+                        vals.add(0)
+            result = 1 in vals
+            logger.debug("include_intermediates values for %s: %s -> %s", prs_name, df['include_intermediates'].tolist(), result)
+            return result
+        except Exception:
+            logger.exception("Could not get include_intermediates for PRS: %s", prs_name)
+            return False
 
-        Returns
-        -------
-        list of str
-            List of GWAS names.
-
-        Examples
-        --------
-        >>> handler = DBHandler('database.db')
-        >>> gwas_names = handler.get_gwas_names()
-        >>> print(gwas_names)
-        ['GWAS1', 'GWAS2', 'GWAS3']
+    def get_correlations(self, prs_name, reference, division, target_type):
+        """Return a table of correlations (phewas_result joined with target metadata).
+        The returned DataFrame has the columns expected by the app before it renames them.
         """
-        conn = self.connect()
-        cursor = conn.cursor()
-        rows = cursor.execute("SELECT name FROM gwas").fetchall()
-        conn.close()
+        logger.debug("get_correlations called prs_name=%s reference=%s division=%s target_type=%s", prs_name, reference, division, target_type)
+        # Log distinct classes available for this PRS to help diagnose empty results
+        try:
+            classes_df = self._query("SELECT DISTINCT t.target_class FROM target t JOIN phewas_result p ON p.target_code = t.target_code WHERE p.prs_name = ?", (prs_name,))
+            logger.debug("Available target_class values for %s: %s", prs_name, classes_df['target_class'].tolist() if not classes_df.empty else [])
+        except Exception:
+            logger.debug("Could not fetch distinct target_class values for %s", prs_name)
 
-        gwas_list = [gwas[0] for gwas in rows]
-
-        return gwas_list
-    
-    def get_gwas_codes(self):
-        """
-        Retrieves a list of all GWAS codes from the database.
-
-        Returns
-        -------
-        list of str
-            List of GWAS codes.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        rows = cursor.execute("SELECT code FROM gwas").fetchall()
-        conn.close()
-
-        gwas_list = [gwas[0] for gwas in rows]
-
-        return gwas_list
-    
-    def get_gwas_name_from_code(self, code):
-        """
-        Retrieves the name of a GWAS with the given code.
-
-        Returns
-        -------
-        str
-            The name for the GWAS.
-
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        query = '''
-        SELECT name FROM gwas WHERE code = ?
-        ''' 
-        name = cursor.execute(query, (code,)).fetchall()
-        conn.close()
-
-        return name
-
-    def get_gwas_code_from_name(self, name):
-        """
-        Retrieves the code of a GWAS with the given name.
-
-        Returns
-        -------
-        str
-            The code for the GWAS.
-
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        query = '''
-        SELECT code FROM gwas WHERE name = ?
-        ''' 
-        name = cursor.execute(query, (name,)).fetchone()
-        if name:
-            name = name[0]  # Extract the single value from the tuple
-        else:
-            name = None  # Handle the case where no result is returned
-        conn.close()
-
-        return name
-
-    def get_correlations(self, gwas, reference, division, target_type):
-        """
-        Fetches correlation data for the specified GWAS, quartile, reference, division, and target type.
-
-        Parameters
-        ----------
-        gwas : str
-            The GWAS name.
-        quartile : int
-            The quartile value.
-        reference : str
-            The reference value.
-        division : str
-            The division value.
-        target_type : str
-            The type of target (e.g., 'Phecode', 'ICD code').
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the correlation data.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
+        sql = """
             SELECT
-                c.gwas,
-                c.target,
-                c.reference,
-                c.division,
-                c.odds_ratio,
-                c.CI_5,
-                c.CI_95,
-                c.P,
-                c.R2,
-                c.logpxdir,
-                t.description,
-                t.class,
-                t.type,
-                g.name
-            FROM
-                correlations c
-            JOIN
-                targets t ON c.target = t.code,
-                gwas g ON c.gwas = g.code
-            WHERE
-                c.gwas = ?
-                AND c.reference = ?
-                AND c.division = ?
-                AND t.type = ?;
-            '''
-        
-        rows = cursor.execute(query, (gwas, reference, division, target_type,)).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-
-    def get_all_gwas_metadata(self):
+                p.prs_name AS GWAS,
+                p.target_code AS Code,
+                ? AS Reference,
+                ? AS Division,
+                p.odds_ratio AS odds_ratio,
+                p.ci_low AS CI_5,
+                p.ci_high AS CI_95,
+                p.p_value AS P,
+                p.beta AS beta,
+                NULL AS R2,
+                t.description AS description,
+                t.domain AS domain,
+                t.target_class AS class,
+                t.target_type AS type
+            FROM phewas_result p
+            LEFT JOIN target t ON t.target_code = p.target_code
+            WHERE p.prs_name = ?
+            -- Case-insensitive substring match on target_class (tolerates 'ICD_codes', 'ICD10', etc.)
+            AND LOWER(COALESCE(t.target_class, '')) LIKE ('%' || LOWER(TRIM(?)) || '%')
+            -- Optionally filter by number of groups (n_groups) if provided as Division
+            AND (p.n_groups = ? OR ? IS NULL)
+            -- Respect the reference selection using robust include_intermediates normalization
+            AND (
+                (? = 'rest' AND LOWER(COALESCE(CAST(p.include_intermediates AS TEXT), '0')) IN ('1','true','t','yes'))
+                OR (? = 'low' AND LOWER(COALESCE(CAST(p.include_intermediates AS TEXT), '0')) NOT IN ('1','true','t','yes'))
+                OR (? IS NULL)
+            )
         """
-        Retrieves metadata for all GWAS.
+        # Normalize division (n_groups) to an integer or None so SQLite binding works correctly
+        try:
+            groups_param = int(division) if division is not None and str(division) != '' else None
+        except Exception:
+            groups_param = None
+        params = (reference, division, prs_name, target_type, groups_param, groups_param, reference, reference, reference)
+        logger.debug("get_correlations executing SQL with params=%s", params)
+        df = self._query(sql, params)
+        logger.debug("get_correlations query returned %d rows", len(df))
+        if df.empty:
+            logger.debug("get_correlations: empty DataFrame for prs=%s target_type=%s", prs_name, target_type)
+            return df
+        # keep old alias for back-compat with app code
+        df['OR'] = df['odds_ratio']
+        logger.debug("get_correlations sample rows:\n%s", df.head().to_string(index=False))
+        # compute logpxdir: -log10(p) * sign(effect)
+        import numpy as np
+        def effect_sign(row):
+            # prefer beta if available
+            if row['type'] == 'continuous' and pd.notnull(row['beta']):
+                return np.sign(row['beta'])
+            if row['type'] == 'binary' and pd.notnull(row['odds_ratio']):
+                try:
+                    return np.sign(row['odds_ratio'] - 1.0)
+                except Exception:
+                    return 0
+            return 0
+        df['logpxdir'] = df.apply(lambda r: (-np.log10(r['P']) * effect_sign(r)) if pd.notnull(r['P']) and r['P']>0 else None, axis=1)
+        # Keep ordering consistent with app expectations
+        cols = ['GWAS','Code','Reference','Division','beta', 'odds_ratio','CI_5','CI_95','P','R2','logpxdir','description','domain','class','type']
+        # ensure domain column exists even if NULL
+        if 'domain' not in df.columns:
+            df['domain'] = None
+        return df[cols]
+
+    def get_prevalences(self, prs_name, target_code):
+        """
+        Return prevalence by PRS percentile for a given PRS and target.
 
         Returns
         -------
         pandas.DataFrame
-            A DataFrame containing the GWAS metadata.
+            Columns: ['percentile', 'prs_column', 'sex', 'prevalence']
+            Empty DataFrame if table does not exist or no data found.
         """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-            SELECT *
-            FROM gwas
-            ''' 
-        
-        rows = cursor.execute(query).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-
-    def get_gwas_metadata(self, gwas):
-        """
-        Retrieves metadata associated with a specific GWAS entry.
-
-        Parameters
-        ----------
-        gwas : str
-            The name of the GWAS.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the GWAS metadata.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-            SELECT *
-            FROM gwas
-            WHERE name = ?;
-            ''' 
-        
-        rows = cursor.execute(query, (gwas,)).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-    
-    def get_indiv_ids(self):
-        """
-        Fetches individual IDs and their corresponding entity IDs.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the individual IDs and entity IDs.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = 'SELECT entity_id, iid FROM individuals'
-
-        rows = cursor.execute(query).fetchall()
-        data = pd.DataFrame(rows, columns=['entity_id', 'iid'])
-
-        conn.close()
-
-        return data
-
-    def get_all_indiv(self):
-        """
-        Fetches individuals data.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the individuals data.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = 'SELECT * FROM individuals'
-
-        rows = cursor.execute(query).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-
-    def get_indiv_stats(self):
-        """
-        Returns the count of total individuals, male individuals, and female individuals.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the statistics of individuals.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT
-            COUNT(DISTINCT i.entity_id) AS total_individuals,
-            SUM(CASE WHEN i.gender = 'Male' THEN 1 ELSE 0 END) AS total_males,
-            SUM(CASE WHEN i.gender = 'Female' THEN 1 ELSE 0 END) AS total_females
-        FROM
-            individuals i
-        '''
-        rows = cursor.execute(query).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-
-    def get_indiv_stats_for_target(self, target):
-        """
-        Fetches the number of individuals with a specific target phenotype.
-
-        Parameters
-        ----------
-        target : str
-            The description of the target phenotype.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the count of individuals with the target phenotype, including males and females.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT
-            COUNT(DISTINCT i.entity_id) AS individuals_with_target,
-            SUM(CASE WHEN i.gender = 'Male' THEN 1 ELSE 0 END) AS males_with_target,
-            SUM(CASE WHEN i.gender = 'Female' THEN 1 ELSE 0 END) AS females_with_target
-        FROM
-            individuals i
-        LEFT JOIN
-            phenotypes p ON i.entity_id = p.indiv_id
-        LEFT JOIN
-            targets t ON p.target_id = t.code
-        WHERE
-            t.description = ?
-        '''
-        rows = cursor.execute(query, (target,)).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-    
-    def get_iid_gender(self):
-        """
-        Returns the iid and gender of all the individuals.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the iid and gender of the individuals.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        query = 'SELECT iid, gender FROM individuals'
-
-        rows = cursor.execute(query).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-        conn.close()
-
-        return data
-
-    def get_target_code(self, desc, t_type):
-        """
-        Retrieves the code for a target based on its description and type.
-
-        Parameters
-        ----------
-        desc : str
-            The description of the target.
-        t_type : str
-            The type of the target (e.g., 'Phecode', 'ICD code').
-
-        Returns
-        -------
-        str
-            A string containing the code for the target
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        query = 'SELECT code FROM targets WHERE description = ? AND type = ?'
-        code = cursor.execute(query, (desc, t_type,)).fetchone()
-        if code:
-            code = code[0]  # Extract the single value from the tuple
-        else:
-            code = None  # Handle the case where no result is returned
-        conn.close()
-
-        return code
-
-    def get_target_codes(self, t_type):
-        """
-        Returns all codes of a type from the database.
-
-        Returns
-        -------
-        list of str
-            List of codes values.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT code FROM targets
-        WHERE type = ?
-        '''
-
-        rows = cursor.execute(query, (t_type,)).fetchall()
-        phecodes = [code[0] for code in rows]
-
-        conn.close()
-
-        return phecodes
-
-    def get_prevalences(self, gwas, target):
-        """
-        Retrieves prevalence data for a given GWAS and target.
-
-        Parameters
-        ----------
-        gwas : str
-            The GWAS ID.
-        target : str
-            The target ID.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing prevalence data.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT
-            percentile,
-            prevalence_all,
-            prevalence_female,
-            prevalence_male
-        FROM
-            prevalences
-        WHERE
-            gwas_id = ? AND target_id = ?
-        '''
-
-        rows = cursor.execute(query, (gwas, target,)).fetchall()    
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-
-        conn.close()
-
-        return data
-    
-    def get_indiv_count(self):
-        """
-        Returns the total count of individuals, with counts for males and females.
-
-        Returns
-        -------
-        list
-            A list containing total individuals, male count, and female count.
-
-        Examples
-        --------
-        >>> handler = DBHandler('database.db')
-        >>> count = handler.get_indiv_count()
-        >>> print(count)
-        [1000, 500, 500]
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT 
-            COUNT(iid) AS total_individuals,
-            SUM(CASE WHEN gender = 'Male' THEN 1 ELSE 0 END) AS male_count,
-            SUM(CASE WHEN gender = 'Female' THEN 1 ELSE 0 END) AS female_count
-        FROM individuals
-        '''
-
-        rows = cursor.execute(query).fetchall()
-        conn.close()
-
-        return list(rows[0]) #return a list with the three items
-    
-    def get_age_and_gender(self):
-        """
-        Retrieves age, gender, BMI, and self-perceived health status for all individuals.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing age, gender, BMI, and self-perceived health status.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = "SELECT gender, age, bmi, self_perceived_hs FROM individuals"
-
-        rows = cursor.execute(query).fetchall()
-        df = pd.DataFrame(rows, columns=['gender', 'age', 'bmi', 'self_perceived_hs'])
-
-        conn.close()
-
-        return df
-    
-    def get_target_stats(self):
-        """
-        Retrieves statistical data about targets and their associated phenotypes.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing target statistics, including gender, age, BMI, and count.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-            SELECT 
-                t.code AS target_id,
-                t.description AS target_description,
-                t.type AS target_type,
-                i.gender,
-                i.age,
-                i.bmi,
-                i.self_perceived_hs,
-                COUNT(*) AS count
-            FROM 
-                phenotypes p
-            JOIN 
-                individuals i ON p.indiv_id = i.entity_id
-            JOIN 
-                targets t ON p.target_id = t.code
-            GROUP BY 
-                t.code, t.description, t.type, i.gender, i.age, i.bmi, i.self_perceived_hs
-            ORDER BY 
-                t.code, i.gender, i.age;
-            '''
-        rows = cursor.execute(query).fetchall()
-        data = pd.DataFrame(rows, columns=[
-                'target_id', 'target_description', 'target_type', 'gender', 'age', 'bmi', 'self_perceived_hs', 'count'
-            ])
-
-        conn.close()
-
-        return data
-    
-    def get_risk_scores(self, target, gwas, percentile):
-        """
-        Returns the risk scores for a specified target, gwas and percentile.
-
-        Parameters
-        ----------
-        target : str
-            The code of the target.
-        gwas: str
-            The code of the GWAS
-        percentile: int
-            The percentile (0 to 99) of interest
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the risk scores.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT
-            i.iid AS individual_id,
-            rs.prs_score AS risk_score,
-            rs.prs_percentile_all AS percentile_all,
-            rs.prs_percentile_female AS percentile_female,
-            rs.prs_percentile_male AS percentile_male,
-            p.phenotype AS has_target
-        FROM individuals i
-        JOIN risk_scores rs ON i.iid = rs.indiv_id
-        LEFT JOIN phenotypes p ON i.iid = p.indiv_id AND p.target_id = ?
-        WHERE rs.gwas_id = ?
-        AND (
-            (rs.prs_percentile_all = ?)
-            OR (rs.prs_percentile_female = ? AND i.gender = 'Female')
-            OR (rs.prs_percentile_male = ? AND i.gender = 'Male')
-        );
-        '''
-
-        rows = cursor.execute(query, (target, gwas, percentile, percentile, percentile,)).fetchall()
-        data = pd.DataFrame(rows)
-        conn.close()
-
-        return data
-
-    def get_all_risk_scores(self):
-        conn = self.connect()
-        cursor = conn.cursor()
-    
-        query = '''SELECT * FROM risk_scores'''
-
-        rows = cursor.execute(query).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-        conn.close()
-
-        return data
-    
-    def get_phenotypes(self, target_type):
-        """
-        Returns the phenotypes for a specified target type (ICD, phecode or metabolite).
-
-        Parameters
-        ----------
-        target_type : str
-            The type of the target.
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the phenotypes for the specified target type.
-        """
-
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT p.indiv_id, p.target_id, t.type
-        FROM phenotypes p
-        JOIN targets t ON p.target_id = t.code
-        WHERE t.type = ?;
-        '''
-        rows = cursor.execute(query, (target_type,)).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-        conn.close()
-
-        return data
-
-    def get_target_scope(self, target):
-        """
-        Returns the scope for a specified target.
-        """
-
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-        SELECT scope FROM targets WHERE code = ?
-        '''
-        rows = cursor.execute(query, (target,)).fetchall()
-        word = rows[0][0] if rows else None
-        conn.close()
-
-        return word
-    
-    def get_target_counts(self, t_type):
-        """
-        Returns a df with indicating the count for each target.
-
-        Parameters
-        ----------
-        t_type : str
-            The type of the target.
-
-        Returns
-        -------
-        pandas.DataFrame
-            A DataFrame containing the count for all targets.
-        """
-
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        query = '''
-            SELECT code AS target_id, phenotype_count
-            FROM targets
-            WHERE type = ?;
-        '''
-        rows = cursor.execute(query,  (t_type,)).fetchall()
-        column_names = [description[0] for description in cursor.description]
-        data = pd.DataFrame(rows, columns=column_names)
-        conn.close()
-
-        return data
-
-    #################################################################################################################################
-    ############################################################ INSERTS ############################################################
-    #################################################################################################################################
-
-    # All inserts are performed with INSERT OR REPLACE to avoid duplicates
-
-    def _bulk_insert(self, batch, query, batch_size=100):
-        """
-        Method for internal use only.  Inserts the batch of data with the specified query.
-
-        Parameters
-        ----------
-        batch: list of lists
-            List where each entry is a list with the parameters needed for one insert.
-        query: str
-            SQL insert statement
-        batch_size: int
-            Maximum size of a transaction batch.  If the batch is longer, it will be split in smaller batches to fit this max.
-        """
-        conn = self.connect()
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA foreign_keys = ON;")
+        logger.debug(
+            "get_prevalences called prs_name=%s target_code=%s",
+            prs_name, target_code
+        )
 
         try:
-            # Begin transaction manually to wrap all inserts in a single transaction (less commit overhead)
-            conn.execute("BEGIN TRANSACTION")
-            for i in range(0, len(batch), batch_size):
-                conn.executemany(query, batch[i:i+batch_size])
-            conn.commit()
+            # Check table existence first
+            exists = self._query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='prevalence'"
+            )
+            if exists.empty:
+                logger.debug("Table does not exist: prevalence")
+                return pd.DataFrame(columns=['percentile', 'prs_column', 'sex', 'prevalence'])
 
-        except sqlite3.IntegrityError as e:
-            conn.execute("ROLLBACK")
-            db_logger.error(f"Integrity error during insert: {e}")
+            sql = """
+                SELECT
+                    percentile,
+                    prs_column,
+                    sex,
+                    prevalence
+                FROM prevalence
+                WHERE prs_name = ?
+                AND target_code = ?
+                ORDER BY percentile, prs_column
+            """
+
+            df = self._query(sql, (prs_name, target_code))
+            logger.debug("get_prevalences returned %d rows", len(df))
+
+            return df
+
         except Exception as e:
-            conn.execute("ROLLBACK")
-            db_logger.error(f"Error during insert: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+            logger.debug(
+                "Could not fetch prevalences for prs=%s target=%s: %s",
+                prs_name, target_code, e
+            )
+            return pd.DataFrame(columns=['percentile', 'prs_column', 'sex', 'prevalence'])
 
-    def set_targets(self, df):
-        """
-        Inserts the df data to the targets table of the DB.
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = f'''
-        INSERT OR REPLACE INTO targets (code, description, class, type, scope) 
-        VALUES (?, ?, ?, ?, ?)
-        '''
-        batch = df[['code', 'description', 'class', 'type', 'scope']].values.tolist()
-        self._bulk_insert(batch=batch, query=query)
 
-    def set_cohorts(self, df):
+    def get_target_code(self, description, target_type):
         """
-        Inserts the df data to the cohorts table of the DB.
+        Return the internal target_code for a given target description and type.
 
         Parameters
         ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = f'''
-        INSERT OR REPLACE INTO cohorts (cohort_name, population) 
-        VALUES (?, ?)
-        '''
-        batch = df[['cohort', 'population']].values.tolist()
-        self._bulk_insert(batch=batch, query=query)
+        description : str
+            Human-readable target description.
+        target_type : str
+            Target type / class (e.g. 'Phecodes', 'ICD_codes', etc.)
 
-    def set_populations(self, df):
+        Returns
+        -------
+        str or None
+            target_code if found, otherwise None.
         """
-        Inserts the df data to the populations table of the DB.
+        logger.debug(
+            "get_target_code called description=%s target_type=%s",
+            description, target_type
+        )
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = f'''
-        INSERT OR REPLACE INTO populations (population) 
-        VALUES (?)
-        '''
-        batch = df[['population']].values.tolist()
-        self._bulk_insert(batch=batch, query=query)
+        if not description:
+            logger.debug("get_target_code: empty description provided")
+            return None
 
-    def set_individuals(self, df):
-        """
-        Inserts the df data to the individuals table of the DB.
+        try:
+            # Check table existence first
+            exists = self._query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='target'"
+            )
+            if exists.empty:
+                logger.debug("Table does not exist: target")
+                return None
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = '''
-        INSERT OR REPLACE INTO individuals (iid, entity_id, gender, age, bmi, self_perceived_hs, cohort)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        '''
-        batch = df[['iid', 'entity_id', 'gender', 'age', 'bmi', 'self_perceived_hs', 'cohort']].values.tolist()
-        self._bulk_insert(batch=batch, query=query)
+            sql = """
+                SELECT target_code
+                FROM target
+                WHERE description = ?
+                AND target_type = ?
+                LIMIT 1
+            """
 
-    def set_gwas(self, df):
-        """
-        Inserts the df data to the gwas table of the DB.
+            df = self._query(sql, (description, target_type))
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        sql_query = '''
-        INSERT OR REPLACE INTO gwas (code, name, link_paper, link_sumstats, link_prevalence_mean, n, population)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        '''
-        batch = df[['code', 'name', 'link_paper', 'link_sumstats', 'link_prevalence_mean', 'n', 'population']].values.tolist()
-        self._bulk_insert(batch=batch, query=sql_query)
+            if df.empty:
+                logger.debug(
+                    "get_target_code: no match for description=%s target_type=%s",
+                    description, target_type
+                )
+                return None
 
-    def set_phenotypes(self, df):
-        """
-        Inserts the df data to the phenotypes table of the DB.
+            code = df.iloc[0]['target_code']
+            logger.debug(
+                "get_target_code: found target_code=%s for description=%s target_type=%s",
+                code, description, target_type
+            )
+            return code
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        insert_statement = '''
-        INSERT OR REPLACE INTO phenotypes (indiv_id, target_id)
-        VALUES (?, ?)
-        '''
-        df.columns = ['indiv_id', 'target_id']
-        batch = df[['indiv_id', 'target_id']].values.tolist()
-        self._bulk_insert(batch=batch, query=insert_statement)
+        except Exception as e:
+            logger.debug(
+                "Could not fetch target_code for description=%s target_type=%s: %s",
+                description, target_type, e
+            )
+            return None
 
-    def set_correlations(self, df):
+    def get_target_type(self, target_code):
         """
-        Inserts the df data to the correlations table of the DB.
+        Return the target_type for a given target_code.
 
         Parameters
         ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = """
-            INSERT OR REPLACE INTO correlations 
-            (gwas, target, reference, division, odds_ratio, CI_5, CI_95, P, R2, logpxdir)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
-        batch = df[['gwas', 'target', 'reference', 'division', 'OR', 'CI_5', 'CI_95', 'P', 'R2', 'logpxdir']].values.tolist()
-        db_logger.info(f"Inserting {len(batch)} rows into correlations.")
-        self._bulk_insert(batch, query)
+        target_code : str
+            Internal code identifying the target (e.g., ICD code, Phecode).
 
-    def set_prs(self, df):
+        Returns
+        -------
+        str or None
+            The target_type if found, otherwise None.
         """
-        Inserts the df data to the risk_score table of the DB.
+        logger.debug("get_target_type called with target_code=%s", target_code)
 
-        Parameters
-        ----------
-        df: pandas.DataFrame
-            DataFrame with the information to be inserted.
-        """
-        query = f"""
-        INSERT OR REPLACE INTO risk_scores (indiv_id, gwas_id, prs_score, prs_percentile_all, prs_percentile_female, prs_percentile_male)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """
-        batch = df[['indiv_id', 'gwas_id', 'prs_score', 'prs_percentile_all', 'prs_percentile_female', 'prs_percentile_male']].values.tolist()
-        self._bulk_insert(batch, query)
+        if not target_code:
+            logger.debug("get_target_type: empty target_code provided")
+            return None
 
-    def set_prevalences(self, prevalences_list):
-        """
-        Inserts the data stored in a list to the prevalences table of the DB.
-        Parameters
-        ----------
-        result_list: list
-            list with the information to be inserted.
-        """
+        try:
+            # Check table existence first
+            exists = self._query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='target'"
+            )
+            if exists.empty:
+                logger.debug("Table does not exist: target")
+                return None
+
+            sql = """
+                SELECT target_type
+                FROM target
+                WHERE target_code = ?
+                LIMIT 1
+            """
+            df = self._query(sql, (target_code,))
+
+            if df.empty:
+                logger.debug("get_target_type: no match for target_code=%s", target_code)
+                return None
+
+            target_type = df.iloc[0]['target_type']
+            logger.debug("get_target_type: found target_type=%s for target_code=%s", target_type, target_code)
+            return target_type
+
+        except Exception as e:
+            logger.debug("Could not fetch target_type for target_code=%s: %s", target_code, e)
+            return None
         
-        query = '''
-        INSERT OR REPLACE INTO prevalences (gwas_id, target_id, percentile, prevalence_all, prevalence_female, prevalence_male)
-        VALUES (?, ?, ?, ?, ?, ?)
-        '''
-        self._bulk_insert(prevalences_list, query)
+    def get_all_gwas_metadata(self):
+            """
+            Retrieves metadata for all GWAS.
+
+            Returns
+            -------
+            pandas.DataFrame
+                A DataFrame containing the GWAS metadata.
+            """
+            logger.debug("get_all_gwas_metadata called")
+            try:
+                df = self._query("SELECT * FROM gwas_metadata")
+                return df
+            except Exception:
+                logger.exception("Could not fetch gwas metadata")
+                return pd.DataFrame()
     
+    def get_cohort_distribution(self, target_code, variable):
+        """
+        Retrieves the distribution of a specified variable for a given target code.
+
+        Parameters
+        ----------
+        target_code : str
+            The target code to filter the data.
+        variable : str
+            The variable for which to retrieve the distribution.
+
+        Returns
+        -------
+        pandas.DataFrame
+            A DataFrame containing the distribution of the specified variable
+            with columns ['category', 'sex', 'count'].
+        """
+        logger.debug("get_cohort_distribution called target_code=%s variable=%s", target_code, variable)
+        try:
+            # Allowlist variables to avoid SQL injection and unexpected column names
+            allowed = ('age', 'bmi', 'self_perceived_hs', 'gender')
+            if variable not in allowed:
+                logger.debug("Unknown variable requested: %s", variable)
+                return pd.DataFrame(columns=['category', 'sex', 'count'])
+
+            sql = """
+                SELECT
+                    category,
+                    sex,
+                    count
+                FROM cohort_distribution
+                WHERE target_code = ?
+                AND variable = ?
+                ORDER BY category, sex
+            """
+            df = self._query(sql, (target_code, variable))
+            return df
+        except Exception:
+            logger.exception("Could not fetch cohort distribution for target_code=%s variable=%s", target_code, variable)
+            return pd.DataFrame(columns=['category', 'sex', 'count'])
+
+    def get_target_stats(self):
+        """
+        Retrieves target information from the target table.
+
+        Returns
+        -------
+        pandas.DataFrame
+            A DataFrame with columns ['target_id', 'target_description', 'target_type']
+            from the target table.
+            Empty DataFrame if table does not exist or no data found.
+        """
+        logger.debug("get_target_stats called")
+        try:
+            sql = """
+                SELECT
+                    target_code,
+                    description,
+                    target_class,
+                    target_type
+                FROM target
+                ORDER BY target_code
+            """
+            df = self._query(sql)
+            if df.empty:
+                logger.debug("No targets found in target table")
+            else:
+                logger.debug("Found %d targets", len(df))
+            df.columns = ['target_id', 'target_description', 'target_class', 'target_type']
+            return df
+        except Exception:
+            logger.exception("Could not fetch targets from target table")
+            return pd.DataFrame(columns=['target_id', 'target_description', 'target_class', 'target_type'])
+        
+    def get_disease_prevalence(self, target_class, sex, top_n=25):
+        """
+        Return top targets by disease prevalence for a given target class and sex.
+
+        Parameters
+        ----------
+        target_class : str
+            The target class to filter (e.g., 'Phecode', 'ICD code').
+        sex : str
+            Sex to filter on in the disease_prevalence table (e.g. 'Male','Female','both').
+        top_n : int, optional
+            Number of top targets to return (default 25).
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame with columns ['target_code','target_id','target_description','target_type','prevalence']
+            ordered by prevalence descending. Empty DataFrame if no data.
+        """
+        logger.debug("get_disease_prevalence called target_class=%s sex=%s top_n=%s", target_class, sex, top_n)
+        try:
+            try:
+                n = int(top_n)
+            except Exception:
+                n = 25
+
+            sql = """
+                SELECT
+                    dp.target_code AS target_code,
+                    dp.target_class AS target_class,
+                    dp.sex AS sex,
+                    dp.prevalence AS prevalence,
+                    t.description AS target_description,
+                    t.target_type AS target_type
+                FROM disease_prevalence dp
+                LEFT JOIN target t ON t.target_code = dp.target_code
+                WHERE dp.target_class = ?
+                AND LOWER(dp.sex) = LOWER(?)
+                ORDER BY dp.prevalence DESC
+                LIMIT ?
+            """
+
+            df = self._query(sql, (target_class, sex, n))
+            if df.empty:
+                logger.debug("get_disease_prevalence: no rows for class=%s sex=%s", target_class, sex)
+                return df
+
+            # Provide a consistent alias the app expects ('target_id') and keep ordering predictable
+            df['target_id'] = df['target_code']
+            logger.debug("get_disease_prevalence: returning %d rows", len(df))
+            return df
+        except Exception:
+            logger.exception("Could not fetch disease prevalence for class=%s sex=%s", target_class, sex)
+            return pd.DataFrame(columns=['target_code', 'target_class', 'sex', 'prevalence'])
+
+    def get_disease_prevalence_by_target(self, target_code):
+        """
+        Return disease prevalence for a specific target and sex.
+
+        Parameters
+        ----------
+        target_code : str
+            The target code to filter.
+        sex : str
+            Sex to filter on in the disease_prevalence table (e.g. 'Male','Female','both').
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame with columns ['target_code','target_class','sex','prevalence']
+            for the given target and sex. Empty DataFrame if no data.
+        """
+        logger.debug("get_disease_prevalence_by_target called target_code=%s", target_code)
+        try:
+            sql = """
+                SELECT
+                    target_code,
+                    target_class,
+                    sex,
+                    prevalence
+                FROM disease_prevalence
+                WHERE target_code = ?
+            """
+
+            df = self._query(sql, (target_code,))
+            if df.empty:
+                logger.debug("get_disease_prevalence_by_target: no rows for target=%s", target_code)
+            else:
+                logger.debug("get_disease_prevalence_by_target: returning %d rows", len(df))
+            return df
+        except Exception:
+            logger.exception("Could not fetch disease prevalence for target=%s", target_code)
+            return pd.DataFrame(columns=['target_code', 'target_class', 'sex', 'prevalence'])   
