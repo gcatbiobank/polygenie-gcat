@@ -167,6 +167,9 @@ def update_graph(disease_value, reference_value, division_value, tab):
     unique_categories = filtered_data['domain'].unique()
     color_map = {category: colorblind_palette_hex[i % len(colorblind_palette_hex)] for i, category in enumerate(unique_categories)}
  
+    filtered_data['odds_ratio_display'] = filtered_data['odds_ratio'].apply(
+        lambda x: f"{x:.2f}" if pd.notna(x) else "N/A"
+    )
     filtered_data = filtered_data.rename(columns={'target':'code'})
     fig = px.scatter(filtered_data, x=x, y=y,
                 title=title,
@@ -179,7 +182,8 @@ def update_graph(disease_value, reference_value, division_value, tab):
                     'description': True,  # Show the description
                     'class': True,
                     'beta': ':.4f',
-                    'odds_ratio': ':.2f',
+                    'odds_ratio_display': True,
+                    'odds_ratio': False,
                     'logpxdir': False,
                     'P': ':.2e'
                 }
@@ -334,7 +338,10 @@ def update_table(disease_value, reference_value, division_value, tab):
 
     filtered_data = filtered_data.dropna(subset=['P'])
     # Round numeric columns to 6 decimal places
+    # Round numeric columns EXCEPT P
     numeric_columns = filtered_data.select_dtypes(include=[np.number]).columns
+    numeric_columns = [c for c in numeric_columns if c != 'P']
+
     filtered_data[numeric_columns] = filtered_data[numeric_columns].round(6)
 
     # Ensure all data types are JSON serializable

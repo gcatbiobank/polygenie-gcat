@@ -94,6 +94,12 @@ def load_regressions(con, results_dir):
         df.rename(columns={"phenotype":"target_code"}, inplace=True)
         df["run_id"] = run_id
         df["prs_name"] = prs
+        
+        before = len(df)
+        df = df[
+            df['SE'].isna() | (df['SE'] < 5.0)
+        ]
+        print(f"Filtered {before - len(df)} unstable rows ({len(df)} remaining)")
 
         # Map column names to DB fields
         if 'OR' in df.columns: df['odds_ratio'] = df['OR']
