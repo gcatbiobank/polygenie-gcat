@@ -97,6 +97,13 @@ layout = dbc.Container(
                 "points below indicate negative ones. Hover over any point to see the effect size, p-value, and number of cases."
             ], style={"marginBottom": "10px"}),
             html.Li([
+                html.Strong("Choose the significance threshold. "),
+                "Use the new 'Significance threshold' selector to choose how association thresholds are drawn. "
+                "The default setting is 'Bonferroni (domain-wise)', which divides alpha by the number of unique domains. "
+                "You can also choose 'Bonferroni (global)' for correction across all tested phenotypes, or "
+                "'FDR (global)' to control the false discovery rate across the entire plot."
+            ], style={"marginBottom": "10px"}),
+            html.Li([
                 html.Strong("Click a point to open the prevalence-by-percentile plot. "),
                 "Click on any point in the scatter plot — for example, E66 (Overweight and obesity) or "
                 "F32 (Major depressive disorder) — to load the prevalence plot below. "

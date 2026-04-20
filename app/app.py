@@ -72,6 +72,12 @@ reference_options = [
 division_options = [{'label': '4 (quartiles)', 'value': '4'},
                     {'label': '10 (deciles)', 'value': '10'}]
 
+significance_options = [
+    {'label': 'Bonferroni (domain-wise)', 'value': 'bonferroni_domain'},
+    {'label': 'Bonferroni (global)', 'value': 'bonferroni_global'},
+    {'label': 'FDR (global)', 'value': 'fdr_global'},
+]
+
 # =========================
 # Targe classes for tabs
 # =========================
@@ -113,6 +119,49 @@ def add_loess(fig, df, x, y, label, visible):
         )
     )
 
+
+def compute_significance_cutoff(pvalues, method='bonferroni', alpha=ALPHA, m=None):
+    """Return a p-value cutoff for Bonferroni or FDR correction."""
+    pvalues = np.asarray(pvalues, dtype=float)
+    pvalues = pvalues[np.isfinite(pvalues)]
+    if m is None:
+        m = len(pvalues)
+
+    if m == 0:
+        return None
+
+    if method == 'fdr':
+        sorted_p = np.sort(pvalues)
+        thresholds = np.arange(1, m + 1) * alpha / m
+        valid = sorted_p <= thresholds
+        if not np.any(valid):
+            return alpha / m
+        return float(sorted_p[valid].max())
+
+    # Default to Bonferroni
+    return alpha / m
+
+
+def get_significance_cutoffs(filtered_data, selection):
+    """Compute a p-value cutoff from filtered data based on the selected threshold strategy."""
+    if selection == 'bonferroni_domain':
+        domain_count = filtered_data['domain'].nunique()
+        cutoff = compute_significance_cutoff(filtered_data['P'].values, method='bonferroni', m=domain_count)
+        label = 'Bonferroni (domain-wise)'
+        return [(label, cutoff, domain_count)]
+
+    if selection == 'bonferroni_global':
+        cutoff = compute_significance_cutoff(filtered_data['P'].values, method='bonferroni', m=len(filtered_data))
+        label = 'Bonferroni (global)'
+        return [(label, cutoff, len(filtered_data))]
+
+    if selection == 'fdr_global':
+        cutoff = compute_significance_cutoff(filtered_data['P'].values, method='fdr', m=len(filtered_data))
+        label = 'FDR (global)'
+        return [(label, cutoff, len(filtered_data))]
+
+    return []
+
 #####################################################################################################################
 ##################################################### Callbacks #####################################################
 #####################################################################################################################
@@ -123,9 +172,10 @@ def add_loess(fig, df, x, y, label, visible):
     [Input('disease-dropdown', 'value'),
      Input('reference-dropdown', 'value'),
      Input('division-dropdown', 'value'),
-     Input('tabs', 'value')],
+     Input('tabs', 'value'),
+     Input('significance-selection-dropdown', 'value')],
 )
-def update_graph(disease_value, reference_value, division_value, tab):
+def update_graph(disease_value, reference_value, division_value, tab, significance_selection):
     """
     Callback function to update the graph contents
 
@@ -189,97 +239,83 @@ def update_graph(disease_value, reference_value, division_value, tab):
                 }
             )
     
-    # Get the number of rows
-    element_count = filtered_data['domain'].nunique()
+    significance_cutoffs = get_significance_cutoffs(filtered_data, significance_selection)
 
-    if element_count:
+    if significance_cutoffs:
+        for idx, (scope_label, cutoff, code_count) in enumerate(significance_cutoffs):
+            if cutoff is None or cutoff <= 0:
+                continue
 
-        positive_sig = -np.log10(0.05/element_count)
-        positive_sig_text = f"{positive_sig:.3f}"
+            positive_sig = -np.log10(cutoff)
+            negative_sig = np.log10(cutoff)
+            threshold_text = f"{cutoff:.2e}"
+            annotation_text = f"{scope_label} ({code_count} codes): {threshold_text}"
+            line_color = 'red' if scope_label == 'Global' else color_map.get(scope_label, 'red')
+            x_offset = 1 - 0.05 * idx
 
-        negative_sig = np.log10(0.05/element_count)
-        negative_sig_text = f"{negative_sig:.3f}"
-
-        # Add the positive significance line
-        fig.add_shape(
-            type="line",
-            x0=0,
-            x1=1,
-            xref='paper',
-            y0=positive_sig,
-            y1=positive_sig,
-            yref='y',
-            line=dict(
-                color="red",
-                width=2,
-                dash="dash",
-            ),
-        )
-
-        # Add a label to the significance line
-        fig.add_annotation(
-            xref="paper", 
-            x=1, 
-            y=positive_sig, 
-            text=positive_sig_text, 
-            showarrow=False, 
-            font=dict(
-                color="red",
-                size=12
-            ),
-            align="right",
-            yshift=10
-        )
-
-        # Add the negative significance line
-        fig.add_shape(
-            type="line",
-            x0=0,
-            x1=1,
-            xref='paper',
-            y0=negative_sig,
-            y1=negative_sig,
-            yref='y',
-            line=dict(
-                color="red",
-                width=2,
-                dash="dash",
-            ),
-        )
-
-        # Add a label to the significance line
-        fig.add_annotation(
-            xref="paper", 
-            x=1, 
-            y=negative_sig, 
-            text=negative_sig_text, 
-            showarrow=False, 
-            font=dict(
-                color="red",
-                size=12
-            ),
-            align="right",
-            yshift=10
-        )
-
-        
-        # Filter data points outside thresholds
-        outliers = filtered_data[(filtered_data['logpxdir'] < negative_sig) | (filtered_data['logpxdir'] > positive_sig)]
-
-        # Add annotations for outliers
-        for index, row in outliers.iterrows():
+            fig.add_shape(
+                type="line",
+                x0=0,
+                x1=1,
+                xref='paper',
+                y0=positive_sig,
+                y1=positive_sig,
+                yref='y',
+                line=dict(
+                    color=line_color,
+                    width=2,
+                    dash="dash",
+                ),
+            )
             fig.add_annotation(
-                x=row[x], 
-                y=row['logpxdir'],
-                text=f"{row[x]}",
+                xref="paper",
+                x=x_offset,
+                y=positive_sig,
+                text=annotation_text,
                 showarrow=False,
                 font=dict(
-                    color="black",
-                    size=12
+                    color=line_color,
+                    size=11
                 ),
-                align="center",
+                align="right",
                 yshift=10
             )
+            fig.add_shape(
+                type="line",
+                x0=0,
+                x1=1,
+                xref='paper',
+                y0=negative_sig,
+                y1=negative_sig,
+                yref='y',
+                line=dict(
+                    color=line_color,
+                    width=2,
+                    dash="dash",
+                ),
+            )
+
+        # Filter data points outside the most conservative thresholds
+        all_positive = [ -np.log10(cutoff) for _, cutoff, _ in significance_cutoffs if cutoff and cutoff > 0 ]
+        all_negative = [ np.log10(cutoff) for _, cutoff, _ in significance_cutoffs if cutoff and cutoff > 0 ]
+        if all_positive and all_negative:
+            positive_sig = min(all_positive)
+            negative_sig = max(all_negative)
+            outliers = filtered_data[(filtered_data['logpxdir'] < negative_sig) | (filtered_data['logpxdir'] > positive_sig)]
+
+            for index, row in outliers.iterrows():
+                fig.add_annotation(
+                    x=row[x], 
+                    y=row['logpxdir'],
+                    text=f"{row[x]}",
+                    showarrow=False,
+                    font=dict(
+                        color="black",
+                        size=12
+                    ),
+                    align="center",
+                    yshift=10
+                )
         
     xname = target_class.replace('_', ' ')
 
@@ -1275,6 +1311,15 @@ prs_page_layout = dbc.Container([
                         placeholder='Select division',
                         clearable=False,
                         value="10",
+                        className="dropdown-box"
+                    ),
+                    html.P('Significance threshold:', className="dropdown-title"),
+                    dcc.Dropdown(
+                        id='significance-selection-dropdown',
+                        options=significance_options,
+                        placeholder='Select threshold',
+                        clearable=False,
+                        value='bonferroni_domain',
                         className="dropdown-box"
                     ),
                 ]),
