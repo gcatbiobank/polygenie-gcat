@@ -425,7 +425,7 @@ class DBHandler:
         Returns
         -------
         pandas.DataFrame
-            A DataFrame with columns ['target_id', 'target_description', 'target_type']
+            A DataFrame with columns ['target_id', 'target_description', 'target_class', 'domain', 'target_type']
             from the target table.
             Empty DataFrame if table does not exist or no data found.
         """
@@ -436,6 +436,7 @@ class DBHandler:
                     target_code,
                     description,
                     target_class,
+                    domain,
                     target_type
                 FROM target
                 ORDER BY target_code
@@ -445,11 +446,11 @@ class DBHandler:
                 logger.debug("No targets found in target table")
             else:
                 logger.debug("Found %d targets", len(df))
-            df.columns = ['target_id', 'target_description', 'target_class', 'target_type']
+            df.columns = ['target_id', 'target_description', 'target_class', 'domain', 'target_type']
             return df
         except Exception:
             logger.exception("Could not fetch targets from target table")
-            return pd.DataFrame(columns=['target_id', 'target_description', 'target_class', 'target_type'])
+            return pd.DataFrame(columns=['target_id', 'target_description', 'target_class', 'domain', 'target_type'])
         
     def get_disease_prevalence(self, target_class, sex, top_n=25):
         """
@@ -543,4 +544,42 @@ class DBHandler:
             return df
         except Exception:
             logger.exception("Could not fetch disease prevalence for target=%s", target_code)
-            return pd.DataFrame(columns=['target_code', 'target_class', 'sex', 'prevalence'])   
+            return pd.DataFrame(columns=['target_code', 'target_class', 'sex', 'prevalence'])
+        
+    def get_all_targets_with_prevalence(self):
+        """
+        Retrieves all targets with their metadata and prevalence data if available.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame with columns ['target_id', 'target_description', 'target_class', 'domain', 'target_type', 'prevalence_male', 'prevalence_female', 'prevalence_both']
+        """
+        logger.debug("get_all_targets_with_prevalence called")
+        try:
+            sql = """
+                SELECT
+                    t.target_code,
+                    t.description,
+                    t.target_class,
+                    t.domain,
+                    t.target_type,
+                    dp_male.prevalence AS prevalence_male,
+                    dp_female.prevalence AS prevalence_female,
+                    dp_both.prevalence AS prevalence_both
+                FROM target t
+                LEFT JOIN disease_prevalence dp_male ON t.target_code = dp_male.target_code AND dp_male.sex = 'male'
+                LEFT JOIN disease_prevalence dp_female ON t.target_code = dp_female.target_code AND dp_female.sex = 'female'
+                LEFT JOIN disease_prevalence dp_both ON t.target_code = dp_both.target_code AND dp_both.sex = 'both'
+                ORDER BY t.target_code
+            """
+            df = self._query(sql)
+            if df.empty:
+                logger.debug("No targets found")
+            else:
+                logger.debug("Found %d targets", len(df))
+            df.columns = ['target_id', 'target_description', 'target_class', 'domain', 'target_type', 'prevalence_male', 'prevalence_female', 'prevalence_both']
+            return df
+        except Exception:
+            logger.exception("Could not fetch targets with prevalence")
+            return pd.DataFrame(columns=['target_id', 'target_description', 'target_class', 'domain', 'target_type', 'prevalence_male', 'prevalence_female', 'prevalence_both'])   

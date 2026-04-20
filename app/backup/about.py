@@ -70,50 +70,7 @@ layout = dbc.Container(
         ),
 
         html.Hr(),
-       
-        # Section: Getting Started Tutorial
-        html.H4("Getting Started"),
-        html.P(
-            "The following walkthrough shows how to reproduce the Frailty PRS analysis "
-            "presented in our paper, using overweight/obesity and major depressive disorder "
-            "as example outcomes."
-        ),
-        html.Ol([
-            html.Li([
-                html.Strong("Select a PRS of interest. "),
-                "From the navigation menu, go to the PRS Visualisation page. "
-                "In the 'Select PRS' dropdown, search for and select 'Fried Frailty'. "
-                "The PheWAS scatter plot will load automatically, showing associations across all phenotypic domains."
-            ], style={"marginBottom": "10px"}),
-            html.Li([
-                html.Strong("Choose a comparison group. "),
-                "Use the 'Reference Group' selector to choose how the top PRS group is compared against the rest of the cohort. "
-                "For the frailty example, select 'Bottom' and '10 (deciles)' to match the analysis shown in the paper."
-            ], style={"marginBottom": "10px"}),
-            html.Li([
-                html.Strong("Explore the PheWAS scatter plot. "),
-                "Each point represents a phenotype, grouped by domain along the x-axis. "
-                "The y-axis shows the signed log₁₀(p-value): points above zero indicate positive associations, "
-                "points below indicate negative ones. Hover over any point to see the effect size, p-value, and number of cases."
-            ], style={"marginBottom": "10px"}),
-            html.Li([
-                html.Strong("Click a point to open the prevalence-by-percentile plot. "),
-                "Click on any point in the scatter plot — for example, E66 (Overweight and obesity) or "
-                "F32 (Major depressive disorder) — to load the prevalence plot below. "
-                "Remember you can zoom in the plot by 'drawing' a square with the mouse. "
-                "This shows how the prevalence of that condition changes across the full PRS distribution, "
-                "with separate lines for males and females. "
-                "For obesity, prevalence rises approximately linearly with similar trends in both sexes. "
-                "For major depression, females show consistently higher rates across all percentiles, "
-                "roughly twice those of males."
-            ], style={"marginBottom": "10px"}),
-            html.Li([
-                html.Strong("Export the results. "),
-                "The full association table below the plots can be sorted, filtered, and downloaded as an Excel file "
-                "using the 'Download Table' button."
-            ], style={"marginBottom": "10px"}),
-        ], style={"paddingLeft": "20px", "lineHeight": "1.8"}),
-        html.Hr(),
+
         # Section 3: Contact & Citation
         html.H4("Contact and Citation"),
         html.P(
@@ -123,14 +80,14 @@ layout = dbc.Container(
         html.P(
             [
                 "For questions or feature suggestions, please contact us at ",
-                html.A("contact email", href="mailto:gcat@igtp.cat"),
+                html.A("contact email", href=""),
                 "."
             ]
         ),
         html.P(
             [
                 "GitHub: ",
-                html.A("PolyGenie repository", href="https://github.com/gcatbiobank/polygenie-gcat", target="_blank")
+                html.A("PolyGenie repository", href="", target="_blank")
             ]
         ),
         html.P(

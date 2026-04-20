@@ -391,43 +391,6 @@ def download_table(n_clicks, stored_data):
             df.to_excel(writer, sheet_name="Sheet1", index=False)
     return dcc.send_bytes(to_excel, "polygenie-table_data.xlsx")
 
-# Callback to populate targets table
-@app.callback(
-    [Output('targets-table-content', 'data'),
-     Output('targets-table-stored-data', 'data')],
-    Input('url', 'pathname')  # Trigger when navigating to /targets
-)
-def update_targets_table(pathname):
-    if pathname != '/targets':
-        return [], []
-    
-    df = db_handler.get_all_targets_with_prevalence()
-    
-    # Format prevalence columns
-    for col in ['prevalence_male', 'prevalence_female', 'prevalence_both']:
-        df[col] = df[col].apply(lambda x: f"{x:.4f}" if pd.notnull(x) else None)
-    
-    data_store = df.to_dict('records')
-    return data_store, data_store
-
-# Callback to handle targets table download
-@app.callback(
-    Output("targets-download-dataframe-excel", "data"),
-    Input("targets-download-button", "n_clicks"),
-    State("targets-table-stored-data", "data"),
-    prevent_initial_call=True
-)
-def download_targets_table(n_clicks, stored_data):
-    if not stored_data:
-        return None
-
-    df = pd.DataFrame(stored_data)
-
-    def to_excel(bytes_io):
-        with pd.ExcelWriter(bytes_io, engine="xlsxwriter") as writer:
-            df.to_excel(writer, sheet_name="Sheet1", index=False)
-    return dcc.send_bytes(to_excel, "polygenie-targets.xlsx")
-
 def filter_values(unfiltered_data, disease_value, quartile_value, reference_value, division_value):
     """
     Function to filter the data according to the content of the filters
@@ -1224,7 +1187,6 @@ navbar = dbc.Navbar(
                 dbc.NavItem(dbc.NavLink("PRS Visualisation", href="/", id='prs-link', className="nav-link active")),
                 dbc.NavItem(dbc.NavLink("GWAS Sources", href="/gwas", id='gwas-link', className="nav-link")),
                 dbc.NavItem(dbc.NavLink("Cohort Overview", href="/cohort", id='cohort-link', className="nav-link")),
-                dbc.NavItem(dbc.NavLink("Targets", href="/targets", id='targets-link', className="nav-link")),
                 dbc.NavItem(dbc.NavLink("About the Project", href="/about", id='about-link', className="nav-link"))
             ], className="ml-auto", navbar=True),
             id="navbar-collapse",
@@ -1310,38 +1272,6 @@ prs_page_layout = dbc.Container([
     dbc.Row([
         # First row with basic statistics and one graph
         dbc.Col([
-            html.Div([
-                html.Span(
-                    "Prevalence by PRS Percentile",
-                    style={"fontWeight": "600", "fontSize": "14px", "color": "#56667A"}
-                ),
-                html.Span(
-                    "?",
-                    id="prevalence-help-icon",
-                    style={
-                        "display": "inline-flex",
-                        "alignItems": "center",
-                        "justifyContent": "center",
-                        "marginLeft": "8px",
-                        "width": "18px",
-                        "height": "18px",
-                        "borderRadius": "50%",
-                        "backgroundColor": "#90BAAD",
-                        "color": "white",
-                        "fontSize": "11px",
-                        "fontWeight": "bold",
-                        "cursor": "pointer",
-                        "verticalAlign": "middle",
-                    }
-                ),
-                dbc.Tooltip(
-                    "Click any point in the PheWAS scatter plot above to display "
-                    "how the prevalence of that condition varies across PRS percentiles, "
-                    "stratified by sex.",
-                    target="prevalence-help-icon",
-                    placement="right",
-                ),
-            ], style={"padding": "8px 4px 0px 4px"}),
             dcc.Graph(
                 id='prevalences-graph',
                 className="prevalences-graph",
@@ -1609,85 +1539,6 @@ gwas_page_layout = dbc.Container([
     ]),
 ], fluid=True)
 
-targets_page_layout = dbc.Container([
-    html.Br(),
-    html.H2([
-        html.Span("All Targets"),
-    ], className="section-heading heading-line"),
-    html.Div([
-        html.Button("Download Table", id='targets-download-button', className='button ms-auto'),
-    ], className="button-box d-flex download-button"),
-    dcc.Download(id="targets-download-dataframe-excel"),
-    dcc.Store(id='targets-table-stored-data'),
-    dbc.Row([
-        html.Div([
-            dash_table.DataTable(
-                id='targets-table-content',
-                columns=[
-                    {"name": "Target ID", "id": "target_id"},
-                    {"name": "Description", "id": "target_description"},
-                    {"name": "Target Class", "id": "target_class"},
-                    {"name": "Domain", "id": "domain"},
-                    {"name": "Target Type", "id": "target_type"},
-                    {"name": "Prevalence (Men)", "id": "prevalence_male"},
-                    {"name": "Prevalence (Women)", "id": "prevalence_female"},
-                    {"name": "Prevalence (Both)", "id": "prevalence_both"},
-                ],
-                data=[],  
-                editable=False,
-                sort_action="native",  # Enable sorting
-                filter_action='native',
-                sort_mode="multi",  # Allow multi-column sorting
-                page_action="native",  # Enable pagination
-                page_current=0,  # Start from first page
-                page_size=20,  # Number of rows per page
-
-                style_cell={
-                    'overflow': 'hidden',
-                    'textOverflow': 'ellipsis',
-                    'whiteSpace': 'normal',
-                    'height': 'auto',
-                    'maxWidth': '600px'
-                },
-                style_cell_conditional=[
-                    {'if': {'column_id': 'target_id'}, 'width': '100px', 'minWidth': '80px', 'maxWidth': '150px'},
-                    {'if': {'column_id': 'target_description'}, 'textAlign': 'left', 'width': '300px', 'minWidth': '200px', 'maxWidth': '500px'},
-                    {'if': {'column_id': 'target_class'}, 'width': '120px', 'minWidth': '100px', 'maxWidth': '150px'},
-                    {'if': {'column_id': 'domain'}, 'textAlign': 'left', 'width': '200px', 'minWidth': '150px', 'maxWidth': '300px'},
-                    {'if': {'column_id': 'target_type'}, 'width': '100px', 'minWidth': '80px', 'maxWidth': '120px'},
-                    {'if': {'column_id': 'prevalence_male'}, 'width': '120px', 'minWidth': '100px', 'maxWidth': '150px', 'textAlign': 'right'},
-                    {'if': {'column_id': 'prevalence_female'}, 'width': '120px', 'minWidth': '100px', 'maxWidth': '150px', 'textAlign': 'right'},
-                    {'if': {'column_id': 'prevalence_both'}, 'width': '120px', 'minWidth': '100px', 'maxWidth': '150px', 'textAlign': 'right'},
-                ],
-                
-                style_header={
-                'backgroundColor': 'rgba(86, 102, 122, .10)',
-                'color': 'black',
-                'fontWeight': 'bold',
-                'textAlign': 'center'
-                },
-
-                style_data_conditional=[
-                {
-                    'if': {'row_index': 'odd'},
-                    'backgroundColor': 'rgba(86, 102, 122, .05)',
-                },
-                {
-                    'if': {'state': 'selected'},
-                    'backgroundColor': 'rgba(255, 101, 66, .10)',
-                    'border': '1px solid #FF6542',
-                },
-                {
-                    'if': {'state': 'active'},
-                    'backgroundColor': 'rgba(255, 101, 66, .10)',
-                    'border': '1px solid #FF6542',
-                }
-            ],
-            )
-        ], id='targets-table-section')
-    ]),
-], fluid=True)
-
 # General app layout
 app.layout = dbc.Container([
     dcc.Location(id='url', refresh=False),
@@ -1703,7 +1554,7 @@ app.layout = dbc.Container([
                     html.H4('Usage and Contact Information'),
                     html.P([
                         "For questions, feedback, request a new PRS, or collaboration inquiries, please contact us at: ",
-                        html.A("gcat@igtp.cat", href="mailto:gcat@igtp.cat")
+                        html.A("gcatbiobank@igtp.cat", href="mailto:gcatbiobank@igtp.cat")
                     ]),
                     html.P("If the tool contributes to a publication, please cite PolyGenie and the original GWAS used to compute the PRS."),
                     html.Button('Accept', id='accept-button', className='button', n_clicks=0),
@@ -1729,8 +1580,6 @@ def display_page(pathname):
         return about_page_layout
     if pathname == '/gwas':
         return gwas_page_layout
-    if pathname == '/targets':
-        return targets_page_layout
     else:
         return prs_page_layout
 
@@ -1738,21 +1587,18 @@ def display_page(pathname):
     Output('prs-link', 'className'),
     Output('gwas-link', 'className'),
     Output('cohort-link', 'className'),
-    Output('targets-link', 'className'),
     Output('about-link', 'className'),
     Input('url', 'pathname')
 )
 def update_nav_links(pathname):
     if pathname in ['/', '/prs']:
-        return 'nav-link active', 'nav-link', 'nav-link', 'nav-link', 'nav-link'
+        return 'nav-link active', 'nav-link', 'nav-link', 'nav-link'
     elif pathname == '/gwas':
-        return 'nav-link', 'nav-link active', 'nav-link', 'nav-link', 'nav-link'
+        return 'nav-link', 'nav-link active', 'nav-link', 'nav-link'
     elif pathname == '/cohort':
-        return 'nav-link', 'nav-link', 'nav-link active', 'nav-link', 'nav-link'
-    elif pathname == '/targets':
-        return 'nav-link', 'nav-link', 'nav-link', 'nav-link active', 'nav-link'
+        return 'nav-link', 'nav-link', 'nav-link active', 'nav-link'
     elif pathname == '/about':
-        return 'nav-link', 'nav-link', 'nav-link', 'nav-link', 'nav-link active'
+        return 'nav-link', 'nav-link', 'nav-link', 'nav-link active'
 
 # Callback to hide modal and show content after accepting the terms
 @app.callback(
